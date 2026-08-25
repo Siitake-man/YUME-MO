@@ -1,0 +1,6 @@
+{
+  "name": "夢のあと - YUME NO ATO",
+  "description": "起床直後に音声で夢を記録し、AIがタイトル・要約・パラメータ・4コマ漫画に変換する夢エンタメアプリ",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

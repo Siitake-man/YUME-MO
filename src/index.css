@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-mincho: 'Zen Old Mincho', serif;
+    --font-gothic: 'Zen Kaku Gothic New', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font-gothic);
+    background-color: #F5F0E8;
+    color: #292622;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  h1, h2, h3, .font-mincho {
+    font-family: var(--font-mincho);
+  }
+
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+}
+
+/* Custom subtle animations */
+@keyframes pulse-gentle {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+
+@keyframes ripple-wave {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+.animate-pulse-gentle {
+  animation: pulse-gentle 3s ease-in-out infinite;
+}
+
+.animate-ripple {
+  animation: ripple-wave 2.2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+/* Washi paper texture overlay */
+.washi-bg {
+  background-color: #F5F0E8;
+  background-image: radial-gradient(#e5dfd3 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Night sky glow */
+.night-card {
+  background: linear-gradient(145deg, #1f253e 0%, #252D4B 100%);
+}
