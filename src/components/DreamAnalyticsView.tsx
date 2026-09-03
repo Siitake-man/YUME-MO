@@ -3,10 +3,12 @@ import { DreamRecord } from '../types';
 import { useUIStyle } from '../context/UIStyleContext';
 import { audioEngine } from '../utils/audioEngine';
 import { 
-  Activity, BarChart3, TrendingUp, Sparkles, Moon, Sun, 
-  Calendar, Award, Brain, Zap, Clock, Tag
+  Activity, BarChart3, TrendingUp, Calendar, Award, Brain, Zap, Clock, Tag, Sparkles
 } from 'lucide-react';
 import { StorybookDecorations } from './Decorations';
+import { UsagiMascot } from './DreamMascots';
+import { HandwrittenPostIt, CuteStamp } from './PlayfulAccents';
+import { SparkleAsset } from './IllustratedAssets';
 
 interface DreamAnalyticsViewProps {
   dreams: DreamRecord[];
@@ -75,6 +77,30 @@ export const DreamAnalyticsView: React.FC<DreamAnalyticsViewProps> = ({
         <p className="text-xs opacity-75 leading-relaxed">
           目覚めの記録から抽出された、あなたの深層心理と睡眠リズムの統計。
         </p>
+      </div>
+
+      {/* Usagi Dream Investigator Greeting Card */}
+      <div 
+        className="rounded-3xl p-3.5 border shadow-sm relative overflow-hidden flex items-center space-x-3 transition-colors"
+        style={{
+          backgroundColor: currentStyle.colors.cardBg,
+          borderColor: currentStyle.colors.border,
+        }}
+      >
+        <div className="shrink-0">
+          <UsagiMascot size="sm" isWalking={true} showSpeech={false} />
+        </div>
+        <div className="flex-1 space-y-1">
+          <div className="flex items-center space-x-2">
+            <span className="font-handwriting font-bold text-xs text-neutral-800 dark:text-neutral-200">
+              星耳うさぎの夢分析レポート
+            </span>
+            <CuteStamp text="解析済" color="#8B5CF6" />
+          </div>
+          <p className="font-handwriting text-[11px] text-neutral-600 dark:text-neutral-300 leading-snug">
+            「最近は『{sortedMotifs[0]?.[0] || '空'}』の出現率が高めピョン！シュール度{avgSurrealism}%で創造力が豊かに冴えわたっているよ！」
+          </p>
+        </div>
       </div>
 
       {/* Summary KPI Cards Grid */}

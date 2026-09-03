@@ -64,9 +64,9 @@ export interface DreamRecord {
   keyVisualImageUrl?: string; // AI generated single-cut art/poster
   likesCount?: number;
   reactions?: {
-    moon: number; // 🌙 しみじみ
-    surreal: number; // 🌀 シュール
-    relatable: number; // 💭 わかる
+    moon: number; // 鑑賞・しみじみ
+    surreal: number; // 奇観・シュール
+    relatable: number; // 共鳴・わかる
   };
   userReaction?: 'moon' | 'surreal' | 'relatable' | null;
   authorName?: string;

@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { DreamRecord } from '../types';
-import { Compass, Sparkles, Tag, Search, Filter, BookOpen, Eye, User, Moon, EyeOff, MessageSquareQuote } from 'lucide-react';
+import { Compass, Tag, Search, Filter, BookOpen, Eye, User, Moon, EyeOff, MessageSquareQuote } from 'lucide-react';
 import { useUIStyle } from '../context/UIStyleContext';
 import { audioEngine } from '../utils/audioEngine';
 import { StorybookDecorations, CelestialDecorations } from './Decorations';
 import { NativeSponsorCard } from './NativeSponsorCard';
+import { NekoMascot } from './DreamMascots';
+import { CuteStamp } from './PlayfulAccents';
+import { MangaFrameEmblem, MoonCrestAsset, SparkleAsset, StarGemAsset, BookJournalAsset } from './IllustratedAssets';
 
 interface DreamGalleryViewProps {
   dreams: DreamRecord[];
@@ -62,6 +65,30 @@ export const DreamGalleryView: React.FC<DreamGalleryViewProps> = ({
         <p className="text-xs opacity-75 leading-relaxed">
           誰かが今朝、消えゆく直前に捕まえた不思議な世界のコレクション。
         </p>
+      </div>
+
+      {/* Dream Neko Specimen Curator Card */}
+      <div 
+        className="rounded-3xl p-3.5 border shadow-sm relative overflow-hidden flex items-center space-x-3 transition-colors"
+        style={{
+          backgroundColor: currentStyle.colors.cardBg,
+          borderColor: currentStyle.colors.border,
+        }}
+      >
+        <div className="shrink-0">
+          <NekoMascot size="sm" isWalking={true} showSpeech={false} />
+        </div>
+        <div className="flex-1 space-y-1">
+          <div className="flex items-center space-x-2">
+            <span className="font-handwriting font-bold text-xs text-neutral-800 dark:text-neutral-200">
+              夢ねこさんの標本番
+            </span>
+            <CuteStamp text="収蔵中" color="#EA580C" />
+          </div>
+          <p className="font-handwriting text-[11px] text-neutral-600 dark:text-neutral-300 leading-snug">
+            「みんなの夢の標本が{publicDreams.length}個あつまってるニャ！雲の上で丸くなりながら読ませてもらうニャ〜」
+          </p>
+        </div>
       </div>
 
       {/* Search and Category Filter */}
@@ -214,13 +241,13 @@ export const DreamGalleryView: React.FC<DreamGalleryViewProps> = ({
                           color: currentStyle.colors.accent,
                         }}
                       >
-                        <BookOpen className="w-3 h-3 mr-1" />
+                        <MangaFrameEmblem size={12} className="mr-1" />
                         4コマ有
                       </span>
                     )}
                   </div>
 
-                  {/* Reaction Bar without generic emojis */}
+                  {/* Reaction Bar with warm illustrated vector icons */}
                   <div className="pt-2 border-t flex items-center justify-between" style={{ borderColor: currentStyle.colors.border }}>
                     <div className="flex items-center space-x-1.5 sm:space-x-2">
                       {/* Moon / Contemplation */}
@@ -229,13 +256,14 @@ export const DreamGalleryView: React.FC<DreamGalleryViewProps> = ({
                           audioEngine.playMechanicalClick('high');
                           onReactDream(dream.id, 'moon');
                         }}
-                        className="flex items-center space-x-1 text-xs px-2.5 py-1 rounded-full border transition-all cursor-pointer"
+                        className="flex items-center space-x-1 text-xs px-2.5 py-1 rounded-full border transition-all cursor-pointer font-warm"
                         style={{
                           backgroundColor: dream.userReaction === 'moon' ? currentStyle.colors.accentSecondary : currentStyle.colors.bg,
                           borderColor: currentStyle.colors.border,
                           color: dream.userReaction === 'moon' ? '#FFFFFF' : currentStyle.colors.textPrimary,
                         }}
                       >
+                        <MoonCrestAsset size={12} className="shrink-0" />
                         <span className="font-serif text-[10px] font-bold tracking-tight">鑑賞</span>
                         <span className="text-[11px] font-mono font-bold">
                           {dream.reactions?.moon || 0}
@@ -248,13 +276,14 @@ export const DreamGalleryView: React.FC<DreamGalleryViewProps> = ({
                           audioEngine.playMechanicalClick('high');
                           onReactDream(dream.id, 'surreal');
                         }}
-                        className="flex items-center space-x-1 text-xs px-2.5 py-1 rounded-full border transition-all cursor-pointer"
+                        className="flex items-center space-x-1 text-xs px-2.5 py-1 rounded-full border transition-all cursor-pointer font-warm"
                         style={{
                           backgroundColor: dream.userReaction === 'surreal' ? currentStyle.colors.accentSecondary : currentStyle.colors.bg,
                           borderColor: currentStyle.colors.border,
                           color: dream.userReaction === 'surreal' ? '#FFFFFF' : currentStyle.colors.textPrimary,
                         }}
                       >
+                        <SparkleAsset size={11} className="shrink-0" />
                         <span className="font-serif text-[10px] font-bold tracking-tight">奇観</span>
                         <span className="text-[11px] font-mono font-bold">
                           {dream.reactions?.surreal || 0}
@@ -267,13 +296,14 @@ export const DreamGalleryView: React.FC<DreamGalleryViewProps> = ({
                           audioEngine.playMechanicalClick('high');
                           onReactDream(dream.id, 'relatable');
                         }}
-                        className="flex items-center space-x-1 text-xs px-2.5 py-1 rounded-full border transition-all cursor-pointer"
+                        className="flex items-center space-x-1 text-xs px-2.5 py-1 rounded-full border transition-all cursor-pointer font-warm"
                         style={{
                           backgroundColor: dream.userReaction === 'relatable' ? currentStyle.colors.accentSecondary : currentStyle.colors.bg,
                           borderColor: currentStyle.colors.border,
                           color: dream.userReaction === 'relatable' ? '#FFFFFF' : currentStyle.colors.textPrimary,
                         }}
                       >
+                        <StarGemAsset size={11} className="shrink-0" />
                         <span className="font-serif text-[10px] font-bold tracking-tight">共鳴</span>
                         <span className="text-[11px] font-mono font-bold">
                           {dream.reactions?.relatable || 0}

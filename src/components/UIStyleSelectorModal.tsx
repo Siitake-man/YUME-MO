@@ -2,6 +2,7 @@ import React from 'react';
 import { useUIStyle, UI_STYLES, UIStyleId } from '../context/UIStyleContext';
 import { Palette, Check, Sparkles, X, Radio } from 'lucide-react';
 import { StorybookDecorations, CelestialDecorations, GlassSpecimenDecorations, RetroCassetteDecorations } from './Decorations';
+import { SparkleAsset, MoonCrestAsset, CloseCrossAsset } from './IllustratedAssets';
 
 interface UIStyleSelectorModalProps {
   isOpen: boolean;
@@ -158,7 +159,11 @@ export const UIStyleSelectorModal: React.FC<UIStyleSelectorModalProps> = ({
                           <div className="text-[10px] opacity-70">天球儀リング・タロット枠</div>
                         </div>
                       </div>
-                      <span className="font-serif text-xs" style={{ color: '#E5C378' }}>✦ ☽ ✦</span>
+                      <div className="flex items-center space-x-1">
+                        <SparkleAsset size={11} />
+                        <MoonCrestAsset size={15} />
+                        <SparkleAsset size={11} />
+                      </div>
                     </div>
                   )}
 

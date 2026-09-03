@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { audioEngine } from '../utils/audioEngine';
+import { SparkleAsset, MoonCrestAsset } from './IllustratedAssets';
 
 // ==========================================
 // 1. 活版手帖・和紙コラージュ (Washi Storybook Assets)
@@ -79,8 +80,10 @@ export const CelestialDecorations = {
       </svg>
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div className="w-20 h-20 rounded-full border border-[#C8A962]/30 flex items-center justify-center">
-          <div className="w-14 h-14 rounded-full border border-[#C8A962]/50 flex items-center justify-center">
-            <span className="text-[#C8A962] text-[10px] font-serif tracking-widest">✦ ☽ ✦</span>
+          <div className="w-14 h-14 rounded-full border border-[#C8A962]/50 flex items-center justify-center space-x-1">
+            <SparkleAsset size={9} />
+            <MoonCrestAsset size={13} />
+            <SparkleAsset size={9} />
           </div>
         </div>
       </div>

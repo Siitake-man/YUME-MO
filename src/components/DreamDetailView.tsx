@@ -7,6 +7,9 @@ import {
 import { useUIStyle } from '../context/UIStyleContext';
 import { audioEngine } from '../utils/audioEngine';
 import { StorybookDecorations } from './Decorations';
+import { BakuMascot } from './DreamMascots';
+import { HandwrittenPostIt, CuteStamp } from './PlayfulAccents';
+import { SpeechBubbleTaleAsset, SparkleAsset, MangaFrameEmblem, MoonCrestAsset } from './IllustratedAssets';
 
 interface DreamDetailViewProps {
   dream: DreamRecord;
@@ -168,6 +171,24 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
             {dream.summary}
           </p>
 
+          {/* Baku Mascot's Taste Review Post-it */}
+          <HandwrittenPostIt color="blue" rotation="rotate-[-1deg]" className="my-1">
+            <div className="flex items-start space-x-2.5">
+              <div className="shrink-0 -mt-1">
+                <BakuMascot size={44} showSpeech={false} />
+              </div>
+              <div className="text-xs leading-relaxed">
+                <div className="font-bold text-indigo-950 flex items-center space-x-1.5">
+                  <span>バクくんの夢ソムリエ講評</span>
+                  <CuteStamp text="美味" color="#4F46E5" />
+                </div>
+                <div className="text-indigo-900/90 mt-0.5">
+                  「今日の夢はシュール度{dream.parameters.surrealism}%！『{dream.motifs[0] || '情景'}』の余韻がとても香ばしくてごちそうさまでした♪」
+                </div>
+              </div>
+            </div>
+          </HandwrittenPostIt>
+
           {/* Motifs and Characters */}
           <div className="flex flex-wrap gap-1.5 pt-1">
             {dream.motifs.map((motif, idx) => (
@@ -299,8 +320,9 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
                       {p.description}
                     </p>
                   )}
-                  <p className="text-[9px] font-mono opacity-60 truncate">
-                    💬 {p.dialogue}
+                  <p className="text-[9px] font-mono opacity-70 truncate flex items-center">
+                    <SpeechBubbleTaleAsset size={11} className="mr-1 inline-block shrink-0" />
+                    <span>{p.dialogue}</span>
                   </p>
                 </div>
               ))}

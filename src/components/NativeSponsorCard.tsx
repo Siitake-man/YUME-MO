@@ -3,6 +3,7 @@ import { useUIStyle } from '../context/UIStyleContext';
 import { audioEngine } from '../utils/audioEngine';
 import { Coffee, Moon, Sparkles, ExternalLink, ShieldCheck, Heart, Gift, Info } from 'lucide-react';
 import { StorybookDecorations, CelestialDecorations, GlassSpecimenDecorations, RetroCassetteDecorations } from './Decorations';
+import { CloseCrossAsset } from './IllustratedAssets';
 
 interface NativeSponsorCardProps {
   variant?: 'feed' | 'banner' | 'comic-footer';
@@ -222,8 +223,9 @@ export const NativeSponsorCard: React.FC<NativeSponsorCardProps> = ({
               <button
                 onClick={() => setShowModal(false)}
                 className="w-7 h-7 rounded-full flex items-center justify-center opacity-60 hover:opacity-100 cursor-pointer"
+                title="閉じる"
               >
-                ✕
+                <CloseCrossAsset size={13} />
               </button>
             </div>
 

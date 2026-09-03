@@ -3,6 +3,7 @@ import { Mic, Square, Sparkles, Volume2, ArrowRight, X, Edit3, Disc, Play, Radio
 import { useUIStyle } from '../context/UIStyleContext';
 import { StorybookDecorations, CelestialDecorations, GlassSpecimenDecorations, RetroCassetteDecorations } from './Decorations';
 import { audioEngine } from '../utils/audioEngine';
+import { MascotListeningBadge } from './DreamMascots';
 
 interface VoiceRecordModalProps {
   isOpen: boolean;
@@ -350,6 +351,11 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
                     }}
                   />
                 ))}
+              </div>
+
+              {/* Cute Mascot Listening Badge */}
+              <div className="w-full max-w-xs">
+                <MascotListeningBadge isRecording={isRecording} />
               </div>
             </div>
           ) : (

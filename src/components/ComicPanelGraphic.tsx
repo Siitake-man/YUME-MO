@@ -136,7 +136,7 @@ export const ComicPanelGraphic: React.FC<ComicPanelGraphicProps> = ({
 
         {styleId === 'retro_manga' && (
           <span className="font-serif font-black text-base sm:text-lg italic tracking-tighter text-black bg-white/95 px-2 py-0.5 border-2 border-black shadow-[2px_2px_0px_#000] rotate-[-4deg]">
-            {['ドドド…', 'ガーン！', 'ババーン!!', 'ピカーン✨'][(panelNumber - 1) % 4]}
+            {['ドドド…', 'ガーン！', 'ババーン!!', 'ピカーン！'][(panelNumber - 1) % 4]}
           </span>
         )}
 

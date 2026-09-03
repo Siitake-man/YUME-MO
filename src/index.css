@@ -2,25 +2,136 @@
 
 @layer base {
   :root {
+    --font-warm: 'Zen Maru Gothic', 'M PLUS Rounded 1c', sans-serif;
     --font-mincho: 'Zen Old Mincho', serif;
     --font-gothic: 'Zen Kaku Gothic New', sans-serif;
     --font-mono: 'DM Mono', monospace;
+    --font-handwriting: 'Yomogi', 'Zen Maru Gothic', cursive;
+    --font-cute: 'Kiwi Maru', 'Zen Maru Gothic', serif;
+    --font-caveat: 'Caveat', cursive;
   }
 
   body {
-    font-family: var(--font-gothic);
+    font-family: var(--font-warm);
     background-color: #F5F0E8;
     color: #292622;
     -webkit-tap-highlight-color: transparent;
+    letter-spacing: 0.02em;
   }
 
   h1, h2, h3, .font-mincho {
     font-family: var(--font-mincho);
   }
 
+  .font-warm {
+    font-family: var(--font-warm);
+  }
+
   .font-mono {
     font-family: var(--font-mono);
   }
+
+  .font-handwriting {
+    font-family: var(--font-handwriting);
+  }
+
+  .font-cute {
+    font-family: var(--font-cute);
+  }
+
+  .font-caveat {
+    font-family: var(--font-caveat);
+  }
+}
+
+/* Mascot Walking & Playful Keyframes */
+@keyframes mascot-bobbing {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-4px) rotate(-1.5deg);
+  }
+  50% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-4px) rotate(1.5deg);
+  }
+}
+
+@keyframes foot-left {
+  0%, 100% {
+    transform: rotate(0deg) translateY(0px);
+  }
+  50% {
+    transform: rotate(-22deg) translateY(-2px);
+  }
+}
+
+@keyframes foot-right {
+  0%, 100% {
+    transform: rotate(0deg) translateY(0px);
+  }
+  50% {
+    transform: rotate(22deg) translateY(-2px);
+  }
+}
+
+@keyframes sleep-bubble {
+  0% {
+    opacity: 0;
+    transform: translateY(4px) scale(0.6);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translateY(-8px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) scale(1.2);
+  }
+}
+
+@keyframes mascot-walk-across {
+  0% {
+    transform: translateX(-40px);
+  }
+  100% {
+    transform: translateX(calc(100% + 40px));
+  }
+}
+
+@keyframes gentle-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-mascot-bob {
+  animation: mascot-bobbing 0.65s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+.animate-foot-left {
+  animation: foot-left 0.65s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+.animate-foot-right {
+  animation: foot-right 0.65s ease-in-out infinite;
+  animation-delay: 0.325s;
+  transform-origin: top center;
+}
+
+.animate-sleep-bubble {
+  animation: sleep-bubble 2.6s ease-in-out infinite;
+}
+
+.animate-float-gentle {
+  animation: gentle-float 3.5s ease-in-out infinite;
 }
 
 /* Custom subtle animations */

@@ -1,7 +1,9 @@
 import React from 'react';
-import { Sparkles, Bell, Moon, Palette } from 'lucide-react';
+import { Bell, Palette } from 'lucide-react';
 import { AppSettings } from '../types';
 import { useUIStyle } from '../context/UIStyleContext';
+import { TsukisamaMascot } from './DreamMascots';
+import { SparkleAsset, MoonCrestAsset } from './IllustratedAssets';
 
 interface HeaderProps {
   settings: AppSettings;
@@ -21,17 +23,20 @@ export const Header: React.FC<HeaderProps> = ({ settings, onSimulateAlarm }) => 
   const hour = now.getHours();
   let greeting = 'おはようございます';
   let subGreeting = '消えてしまう前の世界を、声でつかまえる。';
+  let mascotNote = 'バクくんが待ってるよ♪';
   if (hour >= 11 && hour < 17) {
     greeting = 'こんにちは';
     subGreeting = '今朝の夢の余白を、ふり返る。';
+    mascotNote = '4コマ漫画できた？';
   } else if (hour >= 17 || hour < 4) {
     greeting = 'こんばんは';
     subGreeting = '明日の朝、覚えているといいですね。';
+    mascotNote = 'いい夢みてね Zzz...';
   }
 
   return (
     <header 
-      className="pt-5 pb-3.5 px-4 border-b transition-colors"
+      className="pt-4 pb-3 px-4 border-b transition-colors relative"
       style={{
         backgroundColor: currentStyle.colors.bg,
         borderColor: currentStyle.colors.border,
@@ -39,30 +44,35 @@ export const Header: React.FC<HeaderProps> = ({ settings, onSimulateAlarm }) => 
     >
       <div className="max-w-lg mx-auto">
         {/* Top brand row */}
-        <div className="flex items-center justify-between mb-2.5">
-          <div className="flex items-center space-x-2">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center space-x-2.5">
             <div 
-              className="w-8 h-8 rounded-full flex items-center justify-center shadow-xs"
+              className="w-9 h-9 rounded-2xl flex items-center justify-center shadow-xs border border-white/40"
               style={{
                 backgroundColor: currentStyle.colors.accentSecondary,
                 color: currentStyle.colors.bg,
               }}
             >
-              <Moon className="w-4 h-4" />
+              <MoonCrestAsset size={20} />
             </div>
             <div>
-              <span 
-                className={`${currentStyle.typography.headingFont} text-xl font-bold tracking-widest`}
-                style={{ color: currentStyle.colors.accentSecondary }}
-              >
-                夢のあと
-              </span>
-              <span 
-                className="text-[10px] font-mono tracking-tighter ml-1.5 font-bold uppercase"
-                style={{ color: currentStyle.colors.accent }}
-              >
-                Yume no Ato
-              </span>
+              <div className="flex items-baseline space-x-1.5">
+                <span 
+                  className={`${currentStyle.typography.headingFont} text-xl font-bold tracking-widest`}
+                  style={{ color: currentStyle.colors.accentSecondary }}
+                >
+                  夢のあと
+                </span>
+                <span 
+                  className="text-[10px] font-mono tracking-tighter font-bold uppercase"
+                  style={{ color: currentStyle.colors.accent }}
+                >
+                  Yume no Ato
+                </span>
+              </div>
+              <div className="text-[10px] font-handwriting text-neutral-600 dark:text-neutral-400 -mt-0.5">
+                {mascotNote}
+              </div>
             </div>
           </div>
 
@@ -101,8 +111,8 @@ export const Header: React.FC<HeaderProps> = ({ settings, onSimulateAlarm }) => 
           </div>
         </div>
 
-        {/* Date & Subtext */}
-        <div className="flex items-baseline justify-between pt-1">
+        {/* Date & Subtext + Tsukisama Mascot Avatar */}
+        <div className="flex items-center justify-between pt-1">
           <div>
             <div className="flex items-center space-x-2 text-xs font-mono opacity-70">
               <span>{dateStr}</span>
@@ -125,16 +135,17 @@ export const Header: React.FC<HeaderProps> = ({ settings, onSimulateAlarm }) => 
             </p>
           </div>
 
-          <div className="text-right shrink-0">
+          <div className="flex items-center space-x-2 shrink-0">
+            <TsukisamaMascot size="sm" isWalking={false} showSpeech={false} />
             <span 
-              className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-mono border"
+              className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-mono border"
               style={{
                 backgroundColor: currentStyle.colors.cardBg,
                 borderColor: currentStyle.colors.border,
                 color: currentStyle.colors.textPrimary,
               }}
             >
-              <Sparkles className="w-3 h-3 mr-1" style={{ color: currentStyle.colors.accent }} />
+              <SparkleAsset size={12} className="mr-1" />
               AI記録稼働
             </span>
           </div>

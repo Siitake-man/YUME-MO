@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { ComicStrip, ComicPanel, DreamRecord } from '../types';
 import { audioEngine } from '../utils/audioEngine';
 import { ComicPanelGraphic } from './ComicPanelGraphic';
+import { BakuMascot, HitsujiMascot, TanukiMascot } from './DreamMascots';
+import { CuteStamp } from './PlayfulAccents';
+import { MangaFrameEmblem, SparkleAsset, PencilSketchAsset, LightbulbIdeaAsset, CloseCrossAsset, BookJournalAsset } from './IllustratedAssets';
 import { 
   X, Sparkles, Download, RefreshCw, Copy, Check, BookOpen, Film, 
   Gamepad2, Palette, AlertCircle, Coins, Info, Wand2, CheckCircle2,
@@ -20,7 +23,7 @@ const PRESET_STYLES = [
   { id: 'storybook', label: '水彩絵本', icon: Brush, desc: 'やわらかな水彩・パステルカラー' },
   { id: 'cyber_game', label: '8-Bit ドット絵', icon: Gamepad2, desc: 'レトロRPG・ピクセルアート' },
   { id: 'cinema_poster', label: 'シネマポスター', icon: Film, desc: '35mmフィルム・映画風ライティング' },
-  { id: 'custom', label: '✏️ 自由記述テイスト', icon: Palette, desc: 'お好みの画風・アニメ風を自由に指定' },
+  { id: 'custom', label: '自由記述テイスト', icon: Palette, desc: 'お好みの画風・アニメ風を自由に指定' },
 ];
 
 const SUGGESTED_TAGS = [
@@ -287,7 +290,7 @@ export const ComicGeneratorModal: React.FC<ComicGeneratorModalProps> = ({
     if (hadSpendingCap) {
       setShowSpendingCapAlert(true);
     } else {
-      setShowShareToast('4コマの作画が完了しました！✨');
+      setShowShareToast('4コマの作画が完了しました！');
       setTimeout(() => setShowShareToast(null), 3500);
     }
   };
@@ -304,7 +307,7 @@ export const ComicGeneratorModal: React.FC<ComicGeneratorModalProps> = ({
     if (!comicData) return;
     audioEngine.playMechanicalClick('high');
 
-    const shareText = `今朝の夢をAIで4コマ漫画化しました！📖✨
+    const shareText = `今朝の夢をAIで4コマ漫画化しました！
 
 『${comicData.title}』
 【${comicData.styleLabel}】
@@ -319,7 +322,7 @@ ${comicData.punchline}
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
     window.open(twitterUrl, '_blank', 'noopener,noreferrer');
 
-    setShowShareToast('𝕏の投稿画面を開きました！保存した4コマ画像を添付してポストしよう✨');
+    setShowShareToast('𝕏の投稿画面を開きました！保存した4コマ画像を添付してポストしよう');
     setTimeout(() => setShowShareToast(null), 4500);
   };
 
@@ -423,7 +426,7 @@ ${comicData?.punchline || ''}
       const panelWidth = width - 100; // 740px
       const panelHeight = 445;
       const panelGap = 26;
-      const sfxList = ['ドドド…', 'ガーン！', 'ババーン!!', 'ピカーン✨'];
+      const sfxList = ['ドドド…', 'ガーン！', 'ババーン!!', 'ピカーン！'];
 
       comicData.panels.forEach((p, idx) => {
         const py = panelYStart + idx * (panelHeight + panelGap);
@@ -578,7 +581,7 @@ ${comicData?.punchline || ''}
       link.href = canvas.toDataURL('image/png');
       link.click();
 
-      setShowShareToast('本格4コマ画像を保存しました！𝕏に添付して共有しましょう✨');
+      setShowShareToast('本格4コマ画像を保存しました！𝕏に添付して共有しましょう');
       setTimeout(() => setShowShareToast(null), 3500);
     } catch (err) {
       console.error('Error generating canvas:', err);
@@ -632,12 +635,15 @@ ${comicData?.punchline || ''}
               {showCostDetails && (
                 <div className="absolute right-0 top-full mt-2 w-72 p-3 bg-white dark:bg-[#1A202C] border-2 border-black dark:border-neutral-700 rounded-xl shadow-xl z-50 text-xs text-neutral-800 dark:text-neutral-200">
                   <div className="font-bold border-b pb-1.5 mb-2 flex items-center justify-between">
-                    <span>💡 作画APIコスト概算</span>
+                    <span className="flex items-center space-x-1.5 font-warm">
+                      <LightbulbIdeaAsset size={16} />
+                      <span>作画APIコスト概算</span>
+                    </span>
                     <button 
                       onClick={() => setShowCostDetails(false)}
-                      className="text-neutral-400 hover:text-neutral-600"
+                      className="text-neutral-400 hover:text-neutral-600 p-0.5 cursor-pointer"
                     >
-                      ✕
+                      <CloseCrossAsset size={12} />
                     </button>
                   </div>
                   <div className="space-y-1.5 font-mono text-[11px]">
@@ -690,9 +696,14 @@ ${comicData?.punchline || ''}
             >
               <Wand2 className={`w-3.5 h-3.5 ${isGeneratingAllImages ? 'animate-spin' : ''}`} />
               <span>
-                {isGeneratingAllImages && batchProgress 
-                  ? `${batchProgress.stageName} 作画中 (${batchProgress.current}/${batchProgress.total})` 
-                  : '✨ 全コマ一括AI作画'}
+                {isGeneratingAllImages && batchProgress ? (
+                  `${batchProgress.stageName} 作画中 (${batchProgress.current}/${batchProgress.total})`
+                ) : (
+                  <span className="flex items-center space-x-1 font-warm">
+                    <SparkleAsset size={13} />
+                    <span>全コマ一括AI作画</span>
+                  </span>
+                )}
               </span>
             </button>
           </div>
@@ -719,7 +730,7 @@ ${comicData?.punchline || ''}
                 >
                   <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-amber-600 dark:text-amber-400' : 'text-neutral-500'}`} />
                   <div className="truncate">
-                    <div className="text-xs font-bold text-neutral-900 dark:text-neutral-100 truncate">
+                    <div className="text-xs font-bold text-neutral-900 dark:text-neutral-100 truncate font-warm">
                       {style.label}
                     </div>
                   </div>
@@ -731,8 +742,9 @@ ${comicData?.punchline || ''}
           {/* Custom Style Input Box */}
           {selectedStyle === 'custom' && (
             <div className="mt-3 p-3 bg-white dark:bg-[#1A202C] border-2 border-black dark:border-amber-400/80 rounded-xl shadow-[3px_3px_0px_rgba(0,0,0,1)] animate-fade-in">
-              <label className="block text-xs font-bold text-neutral-800 dark:text-neutral-200 mb-1.5">
-                ✏️ 自由記述テイスト（お好みの画風・アニメ風・作家風などを指定）:
+              <label className="flex items-center space-x-1.5 text-xs font-bold text-neutral-800 dark:text-neutral-200 mb-1.5 font-warm">
+                <PencilSketchAsset size={15} />
+                <span>自由記述テイスト（お好みの画風・アニメ風・作家風などを指定）:</span>
               </label>
               <div className="flex gap-2">
                 <input
@@ -796,7 +808,9 @@ ${comicData?.punchline || ''}
               <CheckCircle2 className="w-4 h-4" />
               <span>{showShareToast}</span>
             </span>
-            <button onClick={() => setShowShareToast(null)} className="text-white/80 hover:text-white cursor-pointer">✕</button>
+            <button onClick={() => setShowShareToast(null)} className="text-white/80 hover:text-white cursor-pointer p-1">
+              <CloseCrossAsset size={12} />
+            </button>
           </div>
         )}
 
@@ -806,7 +820,7 @@ ${comicData?.punchline || ''}
             <div className="flex items-start space-x-2.5">
               <Coins className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
               <div>
-                <div className="font-bold text-amber-900 dark:text-amber-300">
+                <div className="font-bold text-amber-900 dark:text-amber-300 font-warm">
                   Google AI Studioの月間利用上限（Spending Cap）に達しています
                 </div>
                 <div className="text-[11px] text-neutral-600 dark:text-neutral-300 mt-0.5 leading-relaxed">
@@ -819,7 +833,7 @@ ${comicData?.punchline || ''}
                 href="https://ai.studio/spend"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-black font-bold text-[11px] rounded-lg shadow-sm cursor-pointer whitespace-nowrap"
+                className="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-black font-bold text-[11px] rounded-lg shadow-sm cursor-pointer whitespace-nowrap font-warm"
               >
                 上限設定を確認 ↗
               </a>
@@ -828,7 +842,7 @@ ${comicData?.punchline || ''}
                 className="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded-md text-neutral-500 hover:text-neutral-900 dark:hover:text-white cursor-pointer"
                 title="閉じる"
               >
-                ✕
+                <CloseCrossAsset size={12} />
               </button>
             </div>
           </div>
@@ -853,19 +867,34 @@ ${comicData?.punchline || ''}
         {/* Main 4-Koma Manga Stage (Vertical Column Layout) */}
         <div className="flex-1 p-4 sm:p-6 overflow-y-auto bg-[#FAF8F5] dark:bg-[#0E121A]">
           {isGeneratingStructure ? (
-            <div className="py-20 flex flex-col items-center justify-center space-y-4">
-              <div className="w-12 h-12 rounded-full border-4 border-amber-500 border-t-transparent animate-spin" />
-              <p className="font-serif font-bold text-neutral-700 dark:text-neutral-300 text-sm animate-pulse">
-                夢の記憶を起承転結の4コマ漫画に構成中……
-              </p>
+            <div className="py-16 flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="flex items-center justify-center space-x-3 sm:space-x-5">
+                <BakuMascot size="sm" isWalking={true} showSpeech={true} speechText="4コマ構成中…" />
+                <TanukiMascot size="sm" isWalking={true} showSpeech={true} speechText="オチは任せてポン！" />
+                <HitsujiMascot size="sm" isWalking={true} showSpeech={true} speechText="メェ〜♪" />
+              </div>
+              <div className="space-y-1 pt-2">
+                <p className="font-handwriting text-base font-bold text-amber-900 dark:text-amber-300 flex items-center justify-center space-x-1.5">
+                  <SparkleAsset size={16} />
+                  <span>夢の記憶を起承転結の4コマ漫画に仕立てています…</span>
+                </p>
+                <p className="text-xs text-neutral-500 font-cute">
+                  絵コンテ・オチ・セリフをAIとたぬきさんが執筆中
+                </p>
+              </div>
             </div>
           ) : comicData ? (
             <div className="max-w-xl mx-auto bg-white dark:bg-[#141A24] border-4 border-black dark:border-[#3A4659] rounded-xl p-4 sm:p-6 shadow-[8px_8px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_rgba(0,0,0,0.5)]">
               
-              {/* Authentic Manga Title Plaque */}
-              <div className="border-4 border-black dark:border-[#3A4659] p-3 text-center mb-4 bg-[#FAF7F2] dark:bg-[#1A2230] shadow-[3px_3px_0px_#000]">
-                <div className="text-[10px] font-mono tracking-widest text-neutral-600 dark:text-neutral-400 uppercase font-black">
-                  — 夢のあと ４コマ劇場 —
+              {/* Authentic Manga Title Plaque with Tanuki Mascot */}
+              <div className="border-4 border-black dark:border-[#3A4659] p-3 text-center mb-4 bg-[#FAF7F2] dark:bg-[#1A2230] shadow-[3px_3px_0px_#000] relative">
+                <div className="absolute top-2 right-2 hidden sm:block">
+                  <TanukiMascot size="sm" isWalking={false} showSpeech={false} />
+                </div>
+                <div className="text-[10px] font-mono tracking-widest text-neutral-600 dark:text-neutral-400 uppercase font-black flex items-center justify-center space-x-1.5">
+                  <MangaFrameEmblem size={14} />
+                  <span>— 夢のあと ４コマ劇場 —</span>
+                  <CuteStamp text="化変済" color="#B45309" />
                 </div>
                 <h1 className="font-serif font-black text-xl sm:text-2xl text-neutral-900 dark:text-white mt-0.5">
                   {comicData.title}
