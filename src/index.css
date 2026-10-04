@@ -44,135 +44,129 @@
   }
 }
 
-/* Mascot Walking & Playful Keyframes */
-@keyframes mascot-bobbing {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  25% {
-    transform: translateY(-4px) rotate(-1.5deg);
-  }
-  50% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  75% {
-    transform: translateY(-4px) rotate(1.5deg);
-  }
-}
-
-@keyframes foot-left {
-  0%, 100% {
-    transform: rotate(0deg) translateY(0px);
-  }
-  50% {
-    transform: rotate(-22deg) translateY(-2px);
-  }
-}
-
-@keyframes foot-right {
-  0%, 100% {
-    transform: rotate(0deg) translateY(0px);
-  }
-  50% {
-    transform: rotate(22deg) translateY(-2px);
-  }
-}
-
-@keyframes sleep-bubble {
-  0% {
-    opacity: 0;
-    transform: translateY(4px) scale(0.6);
-  }
-  50% {
-    opacity: 0.9;
-    transform: translateY(-8px) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-20px) scale(1.2);
-  }
-}
-
-@keyframes mascot-walk-across {
-  0% {
-    transform: translateX(-40px);
-  }
-  100% {
-    transform: translateX(calc(100% + 40px));
-  }
-}
-
-@keyframes gentle-float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
-}
-
-.animate-mascot-bob {
-  animation: mascot-bobbing 0.65s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-}
-
-.animate-foot-left {
-  animation: foot-left 0.65s ease-in-out infinite;
-  transform-origin: top center;
-}
-
-.animate-foot-right {
-  animation: foot-right 0.65s ease-in-out infinite;
-  animation-delay: 0.325s;
-  transform-origin: top center;
-}
-
-.animate-sleep-bubble {
-  animation: sleep-bubble 2.6s ease-in-out infinite;
-}
-
-.animate-float-gentle {
-  animation: gentle-float 3.5s ease-in-out infinite;
-}
-
-/* Custom subtle animations */
-@keyframes pulse-gentle {
+/* Ethereal Motion & Craftsmanship Keyframes */
+@keyframes breath-pulse {
   0%, 100% {
     transform: scale(1);
-    opacity: 0.9;
+    box-shadow: 0 0 0 0 rgba(168, 68, 50, 0.12);
   }
   50% {
-    transform: scale(1.04);
-    opacity: 1;
+    transform: scale(1.02);
+    box-shadow: 0 0 20px 4px rgba(168, 68, 50, 0.15);
   }
 }
 
-@keyframes ripple-wave {
+@keyframes ripple-ring {
   0% {
-    transform: scale(0.95);
-    opacity: 0.8;
+    transform: scale(0.96);
+    opacity: 0.7;
   }
   100% {
-    transform: scale(1.4);
+    transform: scale(1.35);
     opacity: 0;
   }
 }
 
-.animate-pulse-gentle {
-  animation: pulse-gentle 3s ease-in-out infinite;
+@keyframes ink-bleed {
+  0% {
+    opacity: 0.3;
+    filter: blur(2px);
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: scale(1);
+  }
+}
+
+@keyframes hanko-press {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  40% {
+    transform: scale(0.92) rotate(2deg);
+  }
+  100% {
+    transform: scale(1) rotate(1.5deg);
+  }
+}
+
+@keyframes tape-wobble {
+  0%, 100% {
+    transform: rotate(-1.5deg);
+  }
+  50% {
+    transform: rotate(-1deg);
+  }
+}
+
+.animate-breath {
+  animation: breath-pulse 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 .animate-ripple {
-  animation: ripple-wave 2.2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+  animation: ripple-ring 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
-/* Washi paper texture overlay */
+.animate-ink-bleed {
+  animation: ink-bleed 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-hanko {
+  animation: hanko-press 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Authentic stationery ruled paper lines */
+.ruled-paper {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 31px,
+    rgba(120, 100, 80, 0.08) 31px,
+    rgba(120, 100, 80, 0.08) 32px
+  );
+  line-height: 32px;
+}
+
+/* Dark mode ruled paper lines */
+.ruled-paper-dark {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 31px,
+    rgba(255, 255, 255, 0.05) 31px,
+    rgba(255, 255, 255, 0.05) 32px
+  );
+  line-height: 32px;
+}
+
+/* Subtle letterpress text impression */
+.letterpress {
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.85);
+}
+
+.letterpress-dark {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+/* Washi paper subtle fiber background */
 .washi-bg {
-  background-color: #F5F0E8;
-  background-image: radial-gradient(#e5dfd3 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-color: #F8F5EE;
+  background-image: radial-gradient(#d6cbba 0.75px, transparent 0.75px);
+  background-size: 20px 20px;
 }
 
-/* Night sky glow */
-.night-card {
-  background: linear-gradient(145deg, #1f253e 0%, #252D4B 100%);
+/* Cinnabar Hanko Seal stamp look */
+.hanko-stamp {
+  border: 1.5px solid #A84432;
+  color: #A84432;
+  border-radius: 2px;
+  transform: rotate(1.5deg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mincho);
+  font-weight: 700;
+  user-select: none;
 }

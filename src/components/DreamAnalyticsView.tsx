@@ -7,7 +7,6 @@ import {
 } from 'lucide-react';
 import { StorybookDecorations } from './Decorations';
 import { UsagiMascot } from './DreamMascots';
-import { HandwrittenPostIt, CuteStamp } from './PlayfulAccents';
 import { SparkleAsset } from './IllustratedAssets';
 
 interface DreamAnalyticsViewProps {
@@ -81,7 +80,7 @@ export const DreamAnalyticsView: React.FC<DreamAnalyticsViewProps> = ({
 
       {/* Usagi Dream Investigator Greeting Card */}
       <div 
-        className="rounded-2xl p-3.5 border shadow-xs flex items-center space-x-3 transition-colors"
+        className="p-3.5 rounded-2xl border shadow-xs flex items-center space-x-3 text-xs transition-colors"
         style={{
           backgroundColor: currentStyle.colors.cardBg,
           borderColor: currentStyle.colors.border,
@@ -90,14 +89,15 @@ export const DreamAnalyticsView: React.FC<DreamAnalyticsViewProps> = ({
         <div className="shrink-0">
           <UsagiMascot size="sm" isWalking={true} showSpeech={false} />
         </div>
-        <div className="flex-1 space-y-0.5">
-          <span className="font-semibold text-xs block" style={{ color: currentStyle.colors.textPrimary }}>
-            星耳うさぎの夢分析レポート · 解析済
+        <div className="space-y-0.5 flex-1">
+          <span className="font-serif font-bold text-xs block" style={{ color: currentStyle.colors.textPrimary }}>
+            星耳うさぎの深層観測レポート
           </span>
           <p className="text-xs opacity-75 leading-snug">
-            「最近は『{sortedMotifs[0]?.[0] || '空'}』の出現率が高めピョン！シュール度{avgSurrealism}%で創造力が豊かに冴えわたっているよ！」
+            「最近は『{sortedMotifs[0]?.[0] || '空'}』の出現率が高めピョン！シュール度{avgSurrealism}%で想像力が豊かに冴えわたってるよ！」
           </p>
         </div>
+        <span className="font-mono text-[10px] opacity-40 tracking-widest hidden sm:inline">RADAR</span>
       </div>
 
       {/* Summary KPI Cards Grid */}

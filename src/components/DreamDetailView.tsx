@@ -7,8 +7,6 @@ import {
 import { useUIStyle } from '../context/UIStyleContext';
 import { audioEngine } from '../utils/audioEngine';
 import { StorybookDecorations } from './Decorations';
-import { BakuMascot } from './DreamMascots';
-import { HandwrittenPostIt, CuteStamp } from './PlayfulAccents';
 import { SpeechBubbleTaleAsset, SparkleAsset, MangaFrameEmblem, MoonCrestAsset } from './IllustratedAssets';
 import { DreamShareModal } from './DreamShareModal';
 
@@ -178,23 +176,21 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
             {dream.summary}
           </p>
 
-          {/* Baku Mascot's Taste Review Post-it */}
+          {/* Curatorial Reflection */}
           <div 
-            className="p-3.5 rounded-xl border flex items-start space-x-3 transition-colors"
+            className="p-3.5 rounded-xl border flex items-start space-x-3 transition-colors text-xs"
             style={{
               backgroundColor: currentStyle.colors.bg,
               borderColor: currentStyle.colors.border,
             }}
           >
-            <div className="shrink-0 -mt-0.5">
-              <BakuMascot size={36} showSpeech={false} />
-            </div>
-            <div className="text-xs leading-relaxed">
-              <span className="font-semibold block text-[11px] opacity-75">
-                バクくんの夢ソムリエ講評
+            <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{ backgroundColor: currentStyle.colors.accent }} />
+            <div className="space-y-0.5 leading-relaxed">
+              <span className="font-serif font-medium text-[11px] block opacity-75">
+                夢の余白と無意識の観測
               </span>
-              <p className="mt-0.5 opacity-85">
-                「今日の夢はシュール度{dream.parameters.surrealism}%！『{dream.motifs[0] || '情景'}』の余韻がとても香ばしくてごちそうさまでした」
+              <p className="opacity-80">
+                シュール度 {dream.parameters.surrealism}% · 「{dream.motifs[0] || '情景'}」の余韻が強く残る朝の記憶標本です。
               </p>
             </div>
           </div>
@@ -215,7 +211,7 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
           </div>
         </div>
 
-        {/* Action Button: Transform to 4-Panel Comic / Poster */}
+        {/* Action Button: Transform to 4-Panel Comic / Specimen Scroll */}
         <div 
           className="rounded-2xl p-5 text-white shadow-md relative overflow-hidden"
           style={{
@@ -225,15 +221,15 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
         >
           <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="space-y-1">
-              <div className="flex items-center space-x-1.5 text-xs font-bold" style={{ color: currentStyle.colors.accent }}>
-                <Sparkles className="w-4 h-4" />
-                <span>夢のエンタメ作品化スタジオ</span>
+              <div className="flex items-center space-x-1.5 text-xs font-serif" style={{ color: currentStyle.colors.accent }}>
+                <StorybookDecorations.FeatherPenIcon className="w-4 h-4 text-current" />
+                <span className="tracking-wide">四段絵巻 · 活版挿絵帖</span>
               </div>
               <h3 className={`${currentStyle.typography.headingFont} text-base font-bold text-white`}>
-                {dream.comicStrip ? '4コマ漫画を閲覧・画像出力' : 'この夢を4コマにして保存・共有する'}
+                {dream.comicStrip ? '四段絵巻を閲覧・画像出力' : 'この夢の情景を四段絵巻に仕立てる'}
               </h3>
-              <p className="text-xs opacity-85 leading-relaxed">
-                昭和レトロ漫画、水彩絵本、8-Bitゲーム、35mmシネマ風にAIが変換します。
+              <p className="text-xs opacity-85 leading-relaxed font-serif">
+                朝の無意識を、活版木版画・水彩画・レトロ劇画の四段挿絵として結晶化します。
               </p>
             </div>
 
@@ -243,14 +239,14 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
                 audioEngine.playMechanicalClick('high');
                 onOpenComicStudio(dream);
               }}
-              className="font-bold text-xs sm:text-sm py-2.5 px-4 rounded-xl shadow-md transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95 hover:opacity-90"
+              className="font-serif font-bold text-xs sm:text-sm py-2.5 px-4 rounded-xl shadow-md transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95 hover:opacity-90"
               style={{
                 backgroundColor: currentStyle.colors.recordBtnBg,
                 color: currentStyle.colors.recordBtnText,
               }}
             >
               <BookOpen className="w-4 h-4" />
-              <span>{dream.comicStrip ? '作品スタジオを開く' : '4コマを作成する'}</span>
+              <span>{dream.comicStrip ? '絵巻を開く' : '四段絵巻を編む'}</span>
             </button>
           </div>
         </div>
@@ -268,7 +264,7 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
               <div className="flex items-center space-x-2">
                 <BookOpen className="w-4 h-4" style={{ color: currentStyle.colors.accent }} />
                 <span className={`${currentStyle.typography.headingFont} font-bold text-sm`} style={{ color: currentStyle.colors.textPrimary }}>
-                  4コマ作品（{dream.comicStrip.styleLabel}）
+                  四段絵巻（{dream.comicStrip.styleLabel}）
                 </span>
               </div>
               <button
@@ -276,10 +272,10 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
                   audioEngine.playMechanicalClick('high');
                   onOpenComicStudio(dream);
                 }}
-                className="text-xs underline font-medium cursor-pointer"
+                className="text-xs underline font-serif font-medium cursor-pointer"
                 style={{ color: currentStyle.colors.accent }}
               >
-                作画スタジオで編集・保存
+                絵巻スタジオで調整
               </button>
             </div>
 
@@ -303,14 +299,14 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
                     >
                       {p.stage}
                     </span>
-                    <span className="truncate ml-1 text-[11px]">{p.heading}</span>
+                    <span className="truncate ml-1 text-[11px] font-serif">{p.heading}</span>
                   </div>
                   {p.imageUrl ? (
                     <div className="w-full h-16 rounded-lg overflow-hidden my-1 bg-black/10">
                       <img src={p.imageUrl} alt={p.heading} className="w-full h-full object-cover" />
                     </div>
                   ) : (
-                    <p className="text-[10px] opacity-75 line-clamp-2 leading-tight my-1">
+                    <p className="text-[10px] opacity-75 line-clamp-2 leading-tight my-1 font-serif">
                       {p.description}
                     </p>
                   )}
@@ -323,7 +319,7 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
             </div>
 
             {dream.comicStrip.punchline && (
-              <p className={`${currentStyle.typography.headingFont} text-xs italic text-center pt-1 opacity-90`}>
+              <p className={`${currentStyle.typography.headingFont} text-xs italic text-center pt-1 opacity-90 font-serif`}>
                 {dream.comicStrip.punchline}
               </p>
             )}
@@ -339,50 +335,50 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
           }}
         >
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold flex items-center space-x-1.5" style={{ color: currentStyle.colors.textPrimary }}>
+            <h3 className="text-xs font-serif font-bold flex items-center space-x-1.5" style={{ color: currentStyle.colors.textPrimary }}>
               <Activity className="w-3.5 h-3.5" style={{ color: currentStyle.colors.accent }} />
-              <span>夢の成分パラメータ</span>
+              <span>心象の深度観測</span>
             </h3>
-            <span className="text-[10px] opacity-50 font-mono">AI解析</span>
+            <span className="text-[10px] opacity-50 font-serif">余韻指数</span>
           </div>
 
-          <div className="space-y-2.5 text-xs">
+          <div className="space-y-2.5 text-xs font-serif">
             <div>
               <div className="flex justify-between text-[11px] mb-1">
-                <span className="opacity-80">シュール度（非日常感）</span>
-                <span className="font-mono font-bold">{dream.parameters.surrealism} %</span>
+                <span className="opacity-80">非日常の歪み（シュール度）</span>
+                <span className="font-mono font-bold tabular-nums">{dream.parameters.surrealism} %</span>
               </div>
-              <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: currentStyle.colors.border }}>
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: currentStyle.colors.border }}>
                 <div className="h-full rounded-full" style={{ width: `${dream.parameters.surrealism}%`, backgroundColor: currentStyle.colors.accent }} />
               </div>
             </div>
 
             <div>
               <div className="flex justify-between text-[11px] mb-1">
-                <span className="opacity-80">職場・現実タスク成分</span>
-                <span className="font-mono font-bold">{dream.parameters.workFactor} %</span>
+                <span className="opacity-80">現実の残像（日常・学業）</span>
+                <span className="font-mono font-bold tabular-nums">{dream.parameters.workFactor} %</span>
               </div>
-              <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: currentStyle.colors.border }}>
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: currentStyle.colors.border }}>
                 <div className="h-full rounded-full" style={{ width: `${dream.parameters.workFactor}%`, backgroundColor: currentStyle.colors.accentSecondary }} />
               </div>
             </div>
 
             <div>
               <div className="flex justify-between text-[11px] mb-1">
-                <span className="opacity-80">動物・生物成分</span>
-                <span className="font-mono font-bold">{dream.parameters.catFactor} %</span>
+                <span className="opacity-80">生き物の気配</span>
+                <span className="font-mono font-bold tabular-nums">{dream.parameters.catFactor} %</span>
               </div>
-              <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: currentStyle.colors.border }}>
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: currentStyle.colors.border }}>
                 <div className="h-full bg-emerald-600 rounded-full" style={{ width: `${dream.parameters.catFactor}%` }} />
               </div>
             </div>
 
             <div>
               <div className="flex justify-between text-[11px] mb-1">
-                <span className="opacity-80">浮遊・飛翔感</span>
-                <span className="font-mono font-bold">{dream.parameters.floatiness || dream.parameters.floatingSense || 50} %</span>
+                <span className="opacity-80">浮遊・無重力感</span>
+                <span className="font-mono font-bold tabular-nums">{dream.parameters.floatiness || dream.parameters.floatingSense || 50} %</span>
               </div>
-              <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: currentStyle.colors.border }}>
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: currentStyle.colors.border }}>
                 <div className="h-full bg-sky-500 rounded-full" style={{ width: `${dream.parameters.floatiness || dream.parameters.floatingSense || 50}%` }} />
               </div>
             </div>

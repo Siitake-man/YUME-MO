@@ -7,9 +7,8 @@ import {
 } from 'lucide-react';
 import { useUIStyle, UI_STYLES, UIStyleId } from '../context/UIStyleContext';
 import { audioEngine } from '../utils/audioEngine';
-import { CapybaraMascot } from './DreamMascots';
-import { CuteStamp } from './PlayfulAccents';
 import { AlarmSoundSelector } from './AlarmSoundSelector';
+import { CapybaraMascot } from './DreamMascots';
 import { SparkleAsset, MoonCrestAsset } from './IllustratedAssets';
 
 interface SettingsViewProps {
@@ -320,7 +319,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
       {/* Capybara Relaxation Hot-Spring Card */}
       <div 
-        className="rounded-3xl p-3.5 border shadow-sm relative overflow-hidden flex items-center space-x-3 transition-colors"
+        className="rounded-2xl p-3.5 border shadow-xs relative overflow-hidden flex items-center space-x-3 transition-colors"
         style={{
           backgroundColor: currentStyle.colors.cardBg,
           borderColor: currentStyle.colors.border,
@@ -331,12 +330,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
         <div className="flex-1 space-y-1">
           <div className="flex items-center space-x-2">
-            <span className="font-handwriting font-bold text-xs text-neutral-800 dark:text-neutral-200">
+            <span className="font-serif font-bold text-xs" style={{ color: currentStyle.colors.textPrimary }}>
               雲の露天風呂カピバラさん
             </span>
-            <CuteStamp text="極楽音響" color="#0284C7" />
+            <span className="text-[10px] opacity-60 font-serif">極楽音響</span>
           </div>
-          <p className="font-handwriting text-[11px] text-neutral-600 dark:text-neutral-300 leading-snug">
+          <p className="font-serif text-[11px] opacity-75 leading-snug">
             「ゆずを頭に乗せてぽかぽか〜。優しい目覚まし音と心地よい音量で、気持ちいい朝を迎えようね」
           </p>
         </div>

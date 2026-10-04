@@ -7,8 +7,8 @@ import { useUIStyle } from '../context/UIStyleContext';
 import { AppSettings } from '../types';
 import { StorybookDecorations, CelestialDecorations, RetroCassetteDecorations } from './Decorations';
 import { audioEngine } from '../utils/audioEngine';
-import { MascotListeningBadge } from './DreamMascots';
 import { cleanAndDeduplicateTranscript, hasExcessiveRepetition } from '../utils/textCleaner';
+import { BakuMascot } from './DreamMascots';
 
 interface VoiceRecordModalProps {
   isOpen: boolean;
@@ -368,21 +368,17 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
             </span>
           </div>
 
-          {/* Voiceprint profile indicator badge */}
+          {/* Voiceprint profile indicator text */}
           {onOpenVoiceprintTuning && (
             <button
               onClick={() => {
                 audioEngine.playMechanicalClick('high');
                 onOpenVoiceprintTuning();
               }}
-              className="hidden xs:flex items-center space-x-1 text-[10px] px-2 py-0.5 rounded-full border opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-              style={{
-                borderColor: currentStyle.colors.border,
-                backgroundColor: currentStyle.colors.bg,
-              }}
+              className="hidden xs:flex items-center space-x-1 text-[11px] opacity-75 hover:opacity-100 transition-opacity cursor-pointer font-serif"
               title="声紋プロファイル設定を開く"
             >
-              <Fingerprint className="w-3 h-3 text-emerald-500" />
+              <Fingerprint className="w-3.5 h-3.5 text-emerald-500" />
               <span>声紋補正: {settings?.voiceprintProfile?.isCalibrated ? '学習済み' : '基本'}</span>
             </button>
           )}
@@ -501,6 +497,16 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
                 </button>
               </div>
 
+              {/* Baku-kun Listening Companion */}
+              <div className="py-0.5">
+                <BakuMascot 
+                  size="sm" 
+                  isWalking={isRecording} 
+                  showSpeech={true} 
+                  speechText={isRecording ? 'もぐもぐ… 聞き取り中ボク！' : '起きたての言葉、あつめよう！'} 
+                />
+              </div>
+
               {/* Status Indicator */}
               <div className="text-center">
                 <p className={`${currentStyle.typography.headingFont} text-sm font-bold`} style={{ color: currentStyle.colors.textPrimary }}>
@@ -525,9 +531,11 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
                 ))}
               </div>
 
-              {/* Mascot Listening Badge */}
-              <div className="w-full max-w-xs">
-                <MascotListeningBadge isRecording={isRecording} />
+              {/* Serene Audio Ingress Status */}
+              <div className="w-full max-w-xs text-center pt-1">
+                <p className="text-xs opacity-75 font-serif">
+                  {isRecording ? "声の波形を感知しています · 話し終えたら完了を押してください" : "ボタンを押して、覚えている断片をそっとお話しください"}
+                </p>
               </div>
             </div>
           ) : (

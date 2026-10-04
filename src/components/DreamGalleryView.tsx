@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { DreamRecord } from '../types';
-import { Compass, Tag, Search, Filter, BookOpen, Eye, User, Moon, EyeOff, MessageSquareQuote } from 'lucide-react';
+import { Compass, Search, BookOpen } from 'lucide-react';
 import { useUIStyle } from '../context/UIStyleContext';
 import { audioEngine } from '../utils/audioEngine';
-import { StorybookDecorations, CelestialDecorations } from './Decorations';
+import { StorybookDecorations } from './Decorations';
 import { NativeSponsorCard } from './NativeSponsorCard';
 import { NekoMascot } from './DreamMascots';
-import { CuteStamp } from './PlayfulAccents';
-import { MangaFrameEmblem, MoonCrestAsset, SparkleAsset, StarGemAsset, BookJournalAsset } from './IllustratedAssets';
+import { MoonCrestAsset, SparkleAsset, StarGemAsset } from './IllustratedAssets';
 
 interface DreamGalleryViewProps {
   dreams: DreamRecord[];
@@ -69,7 +68,7 @@ export const DreamGalleryView: React.FC<DreamGalleryViewProps> = ({
 
       {/* Dream Neko Specimen Curator Card */}
       <div 
-        className="rounded-2xl p-3.5 border shadow-xs flex items-center space-x-3 transition-colors"
+        className="p-3.5 rounded-2xl border shadow-xs flex items-center space-x-3 text-xs transition-colors"
         style={{
           backgroundColor: currentStyle.colors.cardBg,
           borderColor: currentStyle.colors.border,
@@ -78,14 +77,15 @@ export const DreamGalleryView: React.FC<DreamGalleryViewProps> = ({
         <div className="shrink-0">
           <NekoMascot size="sm" isWalking={true} showSpeech={false} />
         </div>
-        <div className="flex-1 space-y-0.5">
-          <span className="font-semibold text-xs block" style={{ color: currentStyle.colors.textPrimary }}>
+        <div className="space-y-0.5 flex-1">
+          <span className="font-serif font-bold text-xs block" style={{ color: currentStyle.colors.textPrimary }}>
             夢ねこさんの標本番 · 収蔵中
           </span>
-          <p className="text-xs opacity-75 leading-snug">
-            「みんなの夢の標本が{publicDreams.length}個あつまってるニャ。雲の上で丸くなりながら読ませてもらうニャ〜」
+          <p className="opacity-75 text-[11px] leading-snug">
+            「みんなの夢の標本が {publicDreams.length} 個あつまってるニャ。丸くなりながら読ませてもらうニャ〜」
           </p>
         </div>
+        <span className="font-mono text-[10px] opacity-40 tracking-widest hidden sm:inline">COLLECTION</span>
       </div>
 
       {/* Search and Category Filter */}
