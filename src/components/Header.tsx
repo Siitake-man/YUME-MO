@@ -1,9 +1,8 @@
 import React from 'react';
-import { Bell, Palette, HelpCircle, Compass } from 'lucide-react';
+import { Palette, HelpCircle, Bell } from 'lucide-react';
 import { AppSettings } from '../types';
 import { useUIStyle } from '../context/UIStyleContext';
-import { TsukisamaMascot } from './DreamMascots';
-import { SparkleAsset, MoonCrestAsset } from './IllustratedAssets';
+import { MoonCrestAsset } from './IllustratedAssets';
 
 interface HeaderProps {
   settings: AppSettings;
@@ -22,176 +21,97 @@ export const Header: React.FC<HeaderProps> = ({
 
   const now = new Date();
   const dateStr = now.toLocaleDateString('ja-JP', {
-    month: 'short',
+    month: 'numeric',
     day: 'numeric',
     weekday: 'short',
   });
 
-  const hour = now.getHours();
-  let greeting = 'おはようございます';
-  let subGreeting = '消えてしまう前の世界を、声でつかまえる。';
-  let mascotNote = 'バクくんが待ってるよ♪';
-  if (hour >= 11 && hour < 17) {
-    greeting = 'こんにちは';
-    subGreeting = '今朝の夢の余白を、ふり返る。';
-    mascotNote = '4コマ漫画できた？';
-  } else if (hour >= 17 || hour < 4) {
-    greeting = 'こんばんは';
-    subGreeting = '明日の朝、覚えているといいですね。';
-    mascotNote = 'いい夢みてね Zzz...';
-  }
-
   return (
     <header 
-      className="pt-4 pb-3 px-4 border-b transition-colors relative"
+      className="sticky top-0 z-30 px-5 py-3.5 border-b backdrop-blur-md transition-colors"
       style={{
-        backgroundColor: currentStyle.colors.bg,
+        backgroundColor: currentStyle.colors.navBg,
         borderColor: currentStyle.colors.border,
       }}
     >
-      <div className="max-w-lg mx-auto">
-        {/* Top brand row */}
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center space-x-2.5">
-            <div 
-              className="w-9 h-9 rounded-2xl flex items-center justify-center shadow-xs border border-white/40"
-              style={{
-                backgroundColor: currentStyle.colors.accentSecondary,
-                color: currentStyle.colors.bg,
-              }}
-            >
-              <MoonCrestAsset size={20} />
-            </div>
-            <div>
-              <div className="flex items-baseline space-x-1.5">
-                <span 
-                  className={`${currentStyle.typography.headingFont} text-xl font-bold tracking-widest`}
-                  style={{ color: currentStyle.colors.accentSecondary }}
-                >
-                  夢のあと
-                </span>
-                <span 
-                  className="text-[10px] font-mono tracking-tighter font-bold uppercase"
-                  style={{ color: currentStyle.colors.accent }}
-                >
-                  Yume no Ato
-                </span>
-              </div>
-              <div className="text-[10px] font-handwriting text-neutral-600 dark:text-neutral-400 -mt-0.5">
-                {mascotNote}
-              </div>
-            </div>
+      <div className="flex items-center justify-between">
+        {/* Zone 1: Brand Wordmark */}
+        <div className="flex items-center space-x-2.5">
+          <div 
+            className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0"
+            style={{
+              backgroundColor: currentStyle.colors.accent + '20',
+              color: currentStyle.colors.accent,
+            }}
+          >
+            <MoonCrestAsset size={16} />
           </div>
-
-          {/* Navigation and Action Buttons */}
-          <div className="flex items-center space-x-1.5">
-            {/* Tour Guide Button */}
-            {onOpenTour && (
-              <button
-                onClick={onOpenTour}
-                className="flex items-center space-x-1 text-xs px-2 py-1.5 rounded-full border transition-all cursor-pointer shadow-2xs hover:opacity-90 active:scale-95"
-                style={{
-                  backgroundColor: currentStyle.colors.cardBg,
-                  borderColor: currentStyle.colors.border,
-                  color: currentStyle.colors.textPrimary,
-                }}
-                title="アプリの利用ツアーを見る"
-              >
-                <Compass className="w-3.5 h-3.5" style={{ color: currentStyle.colors.accent }} />
-                <span className="font-bold text-[11px] hidden sm:inline">ツアー</span>
-              </button>
-            )}
-
-            {/* Help & FAQ Button */}
-            {onOpenHelp && (
-              <button
-                onClick={onOpenHelp}
-                className="flex items-center space-x-1 text-xs px-2 py-1.5 rounded-full border transition-all cursor-pointer shadow-2xs hover:opacity-90 active:scale-95"
-                style={{
-                  backgroundColor: currentStyle.colors.cardBg,
-                  borderColor: currentStyle.colors.border,
-                  color: currentStyle.colors.textPrimary,
-                }}
-                title="ヘルプ & よくある質問"
-              >
-                <HelpCircle className="w-3.5 h-3.5" style={{ color: currentStyle.colors.accentSecondary }} />
-                <span className="font-bold text-[11px] hidden sm:inline">ヘルプ</span>
-              </button>
-            )}
-
-            {/* Style Selector Button */}
-            <button
-              onClick={openStyleSelector}
-              className="flex items-center space-x-1 text-xs px-2.5 py-1.5 rounded-full border transition-all cursor-pointer shadow-2xs hover:opacity-90 active:scale-95"
-              style={{
-                backgroundColor: currentStyle.colors.cardBg,
-                borderColor: currentStyle.colors.border,
-                color: currentStyle.colors.textPrimary,
-              }}
-              title="UIスタイルの方向性を切り替え"
+          <div className="flex items-baseline space-x-2">
+            <span 
+              className={`${currentStyle.typography.headingFont} text-lg font-bold tracking-wider`}
+              style={{ color: currentStyle.colors.textPrimary }}
             >
-              <Palette className="w-3.5 h-3.5" style={{ color: currentStyle.colors.accent }} />
-              <span className="font-bold text-[11px] hidden xs:inline">{currentStyle.badge}</span>
-            </button>
-
-            {/* Alarm Demo Trigger */}
-            <button
-              id="header-alarm-demo-btn"
-              onClick={onSimulateAlarm}
-              className="flex items-center space-x-1 text-xs px-2.5 py-1.5 rounded-full border transition-all cursor-pointer shadow-2xs active:scale-95"
-              style={{
-                backgroundColor: currentStyle.colors.accent + '15',
-                borderColor: currentStyle.colors.accent + '40',
-                color: currentStyle.colors.textPrimary,
-              }}
-              title="起床アラームから夢記録への流れをテスト"
-            >
-              <Bell className="w-3.5 h-3.5 animate-bounce" style={{ color: currentStyle.colors.accent }} />
-              <span className="font-medium text-[11px]">朝テスト</span>
-            </button>
+              夢のあと
+            </span>
+            <span className="text-[11px] font-sans opacity-50 tracking-tight hidden sm:inline">
+              {dateStr}
+            </span>
           </div>
         </div>
 
-        {/* Date & Subtext + Tsukisama Mascot Avatar */}
-        <div className="flex items-center justify-between pt-1">
-          <div>
-            <div className="flex items-center space-x-2 text-xs font-mono opacity-70">
-              <span>{dateStr}</span>
-              <span>•</span>
-              <span className="font-medium">
-                次回アラーム {settings.alarmTime}
-              </span>
-            </div>
-            <h1 
-              className={`${currentStyle.typography.headingFont} text-lg font-bold mt-0.5`}
-              style={{ color: currentStyle.colors.textPrimary }}
-            >
-              {greeting}
-            </h1>
-            <p 
-              className="text-xs mt-0.5 leading-relaxed opacity-75"
-              style={{ color: currentStyle.colors.textPrimary }}
-            >
-              {subGreeting}
-            </p>
-          </div>
+        {/* Zone 2: Primary Actions */}
+        <div className="flex items-center space-x-1.5">
+          {/* UI Style Selector Trigger */}
+          <button
+            onClick={openStyleSelector}
+            className="flex items-center space-x-1.5 text-xs px-2.5 py-1.5 rounded-lg border transition-all cursor-pointer hover:opacity-90 active:scale-95"
+            style={{
+              backgroundColor: currentStyle.colors.cardBg,
+              borderColor: currentStyle.colors.border,
+              color: currentStyle.colors.textPrimary,
+            }}
+            title="装丁・UIスタイルの切替"
+          >
+            <Palette className="w-3.5 h-3.5" style={{ color: currentStyle.colors.accent }} />
+            <span className="font-medium text-[11px] hidden xs:inline">{currentStyle.badge}</span>
+          </button>
 
-          <div className="flex items-center space-x-2 shrink-0">
-            <TsukisamaMascot size="sm" isWalking={false} showSpeech={false} />
-            <span 
-              className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-mono border"
+          {/* Help & Guide Modal Trigger */}
+          {onOpenHelp && (
+            <button
+              onClick={onOpenHelp}
+              className="flex items-center space-x-1 text-xs p-1.5 rounded-lg border transition-all cursor-pointer hover:opacity-90 active:scale-95"
               style={{
                 backgroundColor: currentStyle.colors.cardBg,
                 borderColor: currentStyle.colors.border,
                 color: currentStyle.colors.textPrimary,
               }}
+              title="ヘルプ & ガイド"
             >
-              <SparkleAsset size={12} className="mr-1" />
-              AI記録稼働
+              <HelpCircle className="w-3.5 h-3.5 opacity-70" />
+            </button>
+          )}
+
+          {/* Next Alarm Trigger Button */}
+          <button
+            id="header-alarm-demo-btn"
+            onClick={onSimulateAlarm}
+            className="flex items-center space-x-1 text-xs px-2 py-1.5 rounded-lg border transition-all cursor-pointer active:scale-95"
+            style={{
+              backgroundColor: currentStyle.colors.bg,
+              borderColor: currentStyle.colors.border,
+              color: currentStyle.colors.textPrimary,
+            }}
+            title="起床アラーム動作テスト"
+          >
+            <Bell className="w-3.5 h-3.5" style={{ color: currentStyle.colors.accent }} />
+            <span className="text-[11px] font-mono tabular-nums opacity-80 hidden sm:inline">
+              {settings.alarmTime}
             </span>
-          </div>
+          </button>
         </div>
       </div>
     </header>
   );
 };
+

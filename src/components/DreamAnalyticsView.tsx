@@ -54,12 +54,12 @@ export const DreamAnalyticsView: React.FC<DreamAnalyticsViewProps> = ({
   });
 
   return (
-    <div className="pb-28 max-w-lg mx-auto p-4 space-y-4 animate-in fade-in duration-200">
+    <div className="pb-28 w-full max-w-xl md:max-w-2xl mx-auto p-5 space-y-5 animate-in fade-in duration-200">
       {/* Header */}
       <div className="space-y-1">
         <div className="flex items-center space-x-2">
           <div 
-            className="w-7 h-7 rounded-sm flex items-center justify-center shadow-xs"
+            className="w-7 h-7 rounded-lg flex items-center justify-center shadow-xs"
             style={{
               backgroundColor: currentStyle.colors.accentSecondary,
               color: currentStyle.colors.accent,
@@ -69,19 +69,19 @@ export const DreamAnalyticsView: React.FC<DreamAnalyticsViewProps> = ({
           </div>
           <h2 
             className={`${currentStyle.typography.headingFont} text-xl font-bold`}
-            style={{ color: currentStyle.colors.accentSecondary }}
+            style={{ color: currentStyle.colors.textPrimary }}
           >
             無意識の深層カルテ
           </h2>
         </div>
-        <p className="text-xs opacity-75 leading-relaxed">
+        <p className="text-xs opacity-70 leading-relaxed">
           目覚めの記録から抽出された、あなたの深層心理と睡眠リズムの統計。
         </p>
       </div>
 
       {/* Usagi Dream Investigator Greeting Card */}
       <div 
-        className="rounded-3xl p-3.5 border shadow-sm relative overflow-hidden flex items-center space-x-3 transition-colors"
+        className="rounded-2xl p-3.5 border shadow-xs flex items-center space-x-3 transition-colors"
         style={{
           backgroundColor: currentStyle.colors.cardBg,
           borderColor: currentStyle.colors.border,
@@ -90,14 +90,11 @@ export const DreamAnalyticsView: React.FC<DreamAnalyticsViewProps> = ({
         <div className="shrink-0">
           <UsagiMascot size="sm" isWalking={true} showSpeech={false} />
         </div>
-        <div className="flex-1 space-y-1">
-          <div className="flex items-center space-x-2">
-            <span className="font-handwriting font-bold text-xs text-neutral-800 dark:text-neutral-200">
-              星耳うさぎの夢分析レポート
-            </span>
-            <CuteStamp text="解析済" color="#8B5CF6" />
-          </div>
-          <p className="font-handwriting text-[11px] text-neutral-600 dark:text-neutral-300 leading-snug">
+        <div className="flex-1 space-y-0.5">
+          <span className="font-semibold text-xs block" style={{ color: currentStyle.colors.textPrimary }}>
+            星耳うさぎの夢分析レポート · 解析済
+          </span>
+          <p className="text-xs opacity-75 leading-snug">
             「最近は『{sortedMotifs[0]?.[0] || '空'}』の出現率が高めピョン！シュール度{avgSurrealism}%で創造力が豊かに冴えわたっているよ！」
           </p>
         </div>
@@ -107,44 +104,44 @@ export const DreamAnalyticsView: React.FC<DreamAnalyticsViewProps> = ({
       <div className="grid grid-cols-2 gap-3">
         {/* Metric 1: Record Streak */}
         <div 
-          className="rounded-2xl p-3.5 border space-y-1 shadow-2xs relative overflow-hidden"
+          className="rounded-2xl p-4 border space-y-1 shadow-xs relative overflow-hidden"
           style={{
             backgroundColor: currentStyle.colors.cardBg,
             borderColor: currentStyle.colors.border,
           }}
         >
-          <div className="flex items-center justify-between text-xs opacity-70">
+          <div className="flex items-center justify-between text-xs opacity-65">
             <span>連続記録日数</span>
             <Calendar className="w-3.5 h-3.5" style={{ color: currentStyle.colors.accent }} />
           </div>
           <div className="flex items-baseline space-x-1.5 pt-1">
-            <span className="text-2xl font-black font-mono" style={{ color: currentStyle.colors.accentSecondary }}>
+            <span className="text-2xl font-bold font-mono tabular-nums" style={{ color: currentStyle.colors.accentSecondary }}>
               {Math.min(totalDreams, 7)}
             </span>
-            <span className="text-xs font-serif font-bold">日連続</span>
+            <span className="text-xs font-serif opacity-75">日連続</span>
           </div>
-          <p className="text-[10px] opacity-60">朝起きてすぐ声で捕獲</p>
+          <p className="text-[11px] opacity-60">朝起きてすぐ声で捕獲</p>
         </div>
 
         {/* Metric 2: Avg Surrealism */}
         <div 
-          className="rounded-2xl p-3.5 border space-y-1 shadow-2xs relative overflow-hidden"
+          className="rounded-2xl p-4 border space-y-1 shadow-xs relative overflow-hidden"
           style={{
             backgroundColor: currentStyle.colors.cardBg,
             borderColor: currentStyle.colors.border,
           }}
         >
-          <div className="flex items-center justify-between text-xs opacity-70">
+          <div className="flex items-center justify-between text-xs opacity-65">
             <span>平均シュール度</span>
             <Sparkles className="w-3.5 h-3.5" style={{ color: currentStyle.colors.accent }} />
           </div>
-          <div className="flex items-baseline space-x-1.5 pt-1">
-            <span className="text-2xl font-black font-mono" style={{ color: currentStyle.colors.accent }}>
+          <div className="flex items-baseline space-x-1 pt-1">
+            <span className="text-2xl font-bold font-mono tabular-nums" style={{ color: currentStyle.colors.accentSecondary }}>
               {avgSurrealism}
             </span>
-            <span className="text-xs font-mono font-bold">%</span>
+            <span className="text-xs font-mono opacity-70">%</span>
           </div>
-          <p className="text-[10px] opacity-60">非日常・空想強度の指数</p>
+          <p className="text-[11px] opacity-60">非日常・イマジネーション指数</p>
         </div>
       </div>
 

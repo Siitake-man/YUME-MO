@@ -191,7 +191,7 @@ function MainAppContent() {
       case 'washi':
         return (
           <div 
-            className="rounded-3xl p-6 text-white shadow-xl relative overflow-hidden text-center space-y-4 border transition-all"
+            className="rounded-3xl p-6 text-white shadow-lg relative overflow-hidden text-center space-y-4 border transition-all"
             style={{
               background: currentStyle.colors.heroGradient,
               borderColor: currentStyle.colors.border,
@@ -203,30 +203,25 @@ function MainAppContent() {
             </div>
 
             {/* Stamp Hanko in corner */}
-            <div className="absolute bottom-2 right-2 pointer-events-none opacity-80 z-20">
+            <div className="absolute bottom-3 right-3 pointer-events-none opacity-80 z-20">
               <StorybookDecorations.StampHanko text="夢採集" />
             </div>
 
-            <div className="relative z-10 space-y-1 pt-2">
-              <div className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-white/15 backdrop-blur-xs text-[11px] font-serif" style={{ color: currentStyle.colors.accent }}>
+            <div className="relative z-10 space-y-1.5 pt-1">
+              <div className="inline-flex items-center space-x-1.5 text-xs font-serif" style={{ color: currentStyle.colors.accent }}>
                 <StorybookDecorations.FeatherPenIcon />
-                <span className="font-bold ml-1">活版夢草紙・音声録音</span>
+                <span className="font-semibold tracking-wider">活版夢草紙 · 音声採集</span>
               </div>
-              <h2 className={`${currentStyle.typography.headingFont} text-2xl font-bold tracking-wide pt-1`}>
+              <h2 className={`${currentStyle.typography.headingFont} text-2xl font-bold tracking-wide text-white`}>
                 夢を、声でつかまえる
               </h2>
-              <p className="text-xs max-w-xs mx-auto leading-relaxed opacity-85">
-                起きたらひとこと話すだけ。AIが消える前の世界を綺麗な4コマやカルテに仕立てます。
+              <p className="text-xs max-w-sm mx-auto leading-relaxed opacity-80">
+                起きた瞬間の言葉をそのまま。AIが消えてしまう前の余白から物語と4コマを紡ぎます。
               </p>
             </div>
 
-            {/* Washi Record Button with Cute Handwritten Labels */}
-            <div className="relative z-10 py-1 flex items-center justify-center space-x-2 sm:space-x-4">
-              <div className="hidden xs:flex flex-col items-end font-handwriting text-amber-200 text-xs rotate-[-6deg] select-none">
-                <span>＼ 起きたらすぐ！ ／</span>
-                <span className="text-[10px] opacity-90">タップして話すだけ♪</span>
-              </div>
-
+            {/* Washi Record Button */}
+            <div className="relative z-10 py-1 flex justify-center">
               <button
                 id="home-main-record-btn"
                 onClick={() => {
@@ -234,29 +229,32 @@ function MainAppContent() {
                   setIsAlarmTriggered(false);
                   setIsVoiceModalOpen(true);
                 }}
-                className="w-24 h-24 rounded-full shadow-2xl flex flex-col items-center justify-center border-4 border-white/30 transition-all cursor-pointer group active:scale-95 hover:scale-105"
+                className="w-24 h-24 rounded-full shadow-2xl flex flex-col items-center justify-center border-4 border-white/20 transition-all cursor-pointer group active:scale-95 hover:scale-105"
                 style={{
                   backgroundColor: currentStyle.colors.recordBtnBg,
                   color: currentStyle.colors.recordBtnText,
                 }}
               >
                 <Mic className="w-8 h-8 group-hover:scale-110 transition-transform" />
-                <span className="text-[11px] font-bold mt-1 font-serif">夢を語る</span>
+                <span className="text-[11px] font-bold mt-1 font-serif tracking-wider">夢を語る</span>
               </button>
-
-              <div className="hidden xs:flex flex-col items-start font-handwriting text-indigo-200 text-xs rotate-[5deg] select-none">
-                <span>＼ AIが自動で ／</span>
-                <span className="text-[10px] opacity-90 inline-flex items-center space-x-1">
-                  <span>4コマ漫画化</span>
-                  <SparkleAsset size={12} />
-                </span>
-              </div>
             </div>
 
-            {/* Subtle bottom note */}
-            <div className="relative z-10 inline-flex items-center text-[11px] bg-black/20 backdrop-blur-xs px-3 py-1 rounded-full border border-white/10">
-              <Sparkles className="w-3 h-3 mr-1.5" style={{ color: currentStyle.colors.accent }} />
-              <span>「まとまっていなくてOK」断片的な一言を歓迎</span>
+            {/* Integrated Next Alarm Strip */}
+            <div className="relative z-10 pt-2 border-t border-white/10 flex items-center justify-between text-xs opacity-80">
+              <div className="flex items-center space-x-1.5">
+                <Bell className="w-3.5 h-3.5" style={{ color: currentStyle.colors.accent }} />
+                <span>次回アラーム {settings.alarmTime}（起床時自動起動）</span>
+              </div>
+              <button
+                onClick={() => {
+                  audioEngine.playMechanicalClick('high');
+                  setIsAlarmModalOpen(true);
+                }}
+                className="text-[11px] font-medium hover:underline cursor-pointer"
+              >
+                テスト
+              </button>
             </div>
           </div>
         );
@@ -264,28 +262,26 @@ function MainAppContent() {
       case 'midnight':
         return (
           <div 
-            className="rounded-2xl p-6 text-white shadow-2xl relative overflow-hidden text-center space-y-4 border transition-all"
+            className="rounded-3xl p-6 text-white shadow-xl relative overflow-hidden text-center space-y-4 border transition-all"
             style={{
               background: currentStyle.colors.heroGradient,
               borderColor: '#C8A962',
-              boxShadow: '0 0 25px rgba(200, 169, 98, 0.15)',
+              boxShadow: '0 0 20px rgba(200, 169, 98, 0.12)',
             }}
           >
             {/* Gold Tarot Corners */}
             <div className="absolute top-2 left-2"><CelestialDecorations.TarotCorner position="top-left" /></div>
             <div className="absolute top-2 right-2"><CelestialDecorations.TarotCorner position="top-right" /></div>
-            <div className="absolute bottom-2 left-2"><CelestialDecorations.TarotCorner position="bottom-left" /></div>
-            <div className="absolute bottom-2 right-2"><CelestialDecorations.TarotCorner position="bottom-right" /></div>
 
-            <div className="relative z-10 space-y-1">
-              <div className="inline-flex items-center space-x-1 text-[#C8A962] text-[11px] font-serif tracking-widest uppercase">
+            <div className="relative z-10 space-y-1.5">
+              <div className="inline-flex items-center space-x-1.5 text-[#C8A962] text-xs font-serif tracking-widest uppercase">
                 <CelestialDecorations.MoonPhaseIcon />
-                <span className="font-bold">ASTROLABE DREAM RECORDER</span>
+                <span className="font-semibold">ASTROLABE DREAM RECORDER</span>
               </div>
               <h2 className={`${currentStyle.typography.headingFont} text-2xl font-bold tracking-widest text-[#F1F4FA]`}>
                 星辰と夢の観測儀
               </h2>
-              <p className="text-xs max-w-xs mx-auto leading-relaxed text-[#8B9BB4]">
+              <p className="text-xs max-w-sm mx-auto leading-relaxed text-[#8B9BB4]">
                 寝起きの無意識を天球儀へ吹き込み、神秘のタロットと4コマ星図へ昇華。
               </p>
             </div>
@@ -313,18 +309,28 @@ function MainAppContent() {
               </div>
             </div>
 
-            {/* Hint */}
-            <div className="relative z-10 inline-flex items-center space-x-1.5 text-[11px] bg-[#C8A962]/10 text-[#C8A962] px-3 py-1 rounded-full border border-[#C8A962]/30 font-serif">
-              <SparkleAsset size={10} />
-              <span>夢の破片を夜空の記録に残す</span>
-              <SparkleAsset size={10} />
+            {/* Integrated Next Alarm Strip */}
+            <div className="relative z-10 pt-2 border-t border-white/10 flex items-center justify-between text-xs text-[#8B9BB4]">
+              <div className="flex items-center space-x-1.5">
+                <Bell className="w-3.5 h-3.5 text-[#C8A962]" />
+                <span>次回観測アラーム {settings.alarmTime}</span>
+              </div>
+              <button
+                onClick={() => {
+                  audioEngine.playMechanicalClick('high');
+                  setIsAlarmModalOpen(true);
+                }}
+                className="text-[11px] text-[#C8A962] font-medium hover:underline cursor-pointer"
+              >
+                テスト
+              </button>
             </div>
           </div>
         );
 
       case 'vintage':
         return (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <RetroAnimeBoombox
               isRecording={false}
               onRecordToggle={() => {
@@ -332,15 +338,38 @@ function MainAppContent() {
                 setIsVoiceModalOpen(true);
               }}
             />
+            {/* Integrated Next Alarm Strip for Vintage */}
+            <div 
+              className="p-3 rounded-xl border flex items-center justify-between text-xs"
+              style={{
+                backgroundColor: currentStyle.colors.cardBg,
+                borderColor: currentStyle.colors.border,
+                color: currentStyle.colors.textPrimary,
+              }}
+            >
+              <div className="flex items-center space-x-2 font-mono">
+                <span className="text-red-500 font-bold">[ALARM]</span>
+                <span>TIMER {settings.alarmTime}</span>
+              </div>
+              <button
+                onClick={() => {
+                  audioEngine.playMechanicalClick('high');
+                  setIsAlarmModalOpen(true);
+                }}
+                className="text-[11px] font-mono px-2 py-0.5 rounded border border-white/20 hover:bg-white/10 cursor-pointer"
+              >
+                TEST
+              </button>
+            </div>
           </div>
         );
 
       case 'pastel':
         return (
           <div 
-            className="rounded-3xl p-6 text-[#242938] shadow-xl relative overflow-hidden text-center space-y-4 border transition-all"
+            className="rounded-3xl p-6 text-[#242938] shadow-lg relative overflow-hidden text-center space-y-4 border transition-all"
             style={{
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(238,242,255,0.85) 100%)',
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(240,245,250,0.9) 100%)',
               borderColor: 'rgba(255,255,255,0.9)',
               backdropFilter: 'blur(10px)',
             }}
@@ -350,20 +379,20 @@ function MainAppContent() {
               <GlassSpecimenDecorations.FloatingOrb />
             </div>
 
-            <div className="relative z-10 space-y-1">
+            <div className="relative z-10 space-y-1.5">
               <div className="flex justify-center">
                 <GlassSpecimenDecorations.SpecimenLabel id="SPEC-COLLECTOR" name="夢の結晶保管庫" />
               </div>
-              <h2 className={`${currentStyle.typography.headingFont} text-2xl font-bold tracking-tight text-[#242938] pt-2`}>
+              <h2 className={`${currentStyle.typography.headingFont} text-2xl font-bold tracking-tight text-[#242938] pt-1`}>
                 夢の標本をつくる
               </h2>
-              <p className="text-xs max-w-xs mx-auto leading-relaxed text-[#5C6479]">
+              <p className="text-xs max-w-sm mx-auto leading-relaxed text-[#5C6479]">
                 目覚めた瞬間の言葉を、ぷっくりとしたガラス標本と4コマへ閉じ込めます。
               </p>
             </div>
 
             {/* Clay 3D style button */}
-            <div className="relative z-10 py-2 flex justify-center">
+            <div className="relative z-10 py-1 flex justify-center">
               <button
                 id="home-main-record-btn"
                 onClick={() => {
@@ -373,7 +402,7 @@ function MainAppContent() {
                 }}
                 className="w-24 h-24 rounded-full shadow-xl flex flex-col items-center justify-center border-4 border-white transition-all cursor-pointer group active:scale-95 hover:scale-105"
                 style={{
-                  backgroundColor: '#6366F1',
+                  backgroundColor: '#0D9488',
                   color: '#FFFFFF',
                 }}
               >
@@ -382,17 +411,28 @@ function MainAppContent() {
               </button>
             </div>
 
-            {/* Hint badge */}
-            <div className="relative z-10 inline-flex items-center text-[11px] bg-indigo-50 text-indigo-700 px-3.5 py-1 rounded-full border border-indigo-100 font-medium">
-              <Sparkles className="w-3 h-3 mr-1.5 text-indigo-500" />
-              <span>声の欠片から4コマを自動標本化</span>
+            {/* Integrated Next Alarm Strip */}
+            <div className="relative z-10 pt-2 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-600">
+              <div className="flex items-center space-x-1.5">
+                <Bell className="w-3.5 h-3.5 text-[#0D9488]" />
+                <span>次回アラーム {settings.alarmTime}</span>
+              </div>
+              <button
+                onClick={() => {
+                  audioEngine.playMechanicalClick('high');
+                  setIsAlarmModalOpen(true);
+                }}
+                className="text-[11px] text-[#0D9488] font-medium hover:underline cursor-pointer"
+              >
+                テスト
+              </button>
             </div>
           </div>
         );
     }
   };
 
-  // Render style-specific Dream Card
+  // Render style-specific Dream Card with Zero-Pill typography
   const renderDreamCard = (dream: DreamRecord) => {
     return (
       <div
@@ -401,11 +441,11 @@ function MainAppContent() {
           audioEngine.playMechanicalClick('low');
           setSelectedDream(dream);
         }}
-        className="p-4 border shadow-2xs hover:scale-[1.005] transition-all cursor-pointer space-y-2 group relative overflow-hidden"
+        className="p-4 border shadow-xs hover:border-slate-400/40 transition-all cursor-pointer space-y-2 group relative overflow-hidden"
         style={{
           backgroundColor: currentStyle.colors.cardBg,
           borderColor: currentStyle.colors.border,
-          borderRadius: currentStyle.typography.cardRadius === 'rounded-3xl' ? '1.5rem' : currentStyle.typography.cardRadius === 'rounded-2xl' ? '1rem' : '0.5rem',
+          borderRadius: currentStyle.typography.cardRadius === 'rounded-3xl' ? '1.25rem' : currentStyle.typography.cardRadius === 'rounded-2xl' ? '1rem' : '0.5rem',
         }}
       >
         {/* Style specific card accent */}
@@ -420,59 +460,48 @@ function MainAppContent() {
           </div>
         )}
 
-        <div className="flex items-center justify-between text-xs opacity-70">
-          <div className="flex items-center space-x-1.5 font-mono">
-            {currentStyle.id === 'vintage' && <span className="text-[#4EF2BB] font-bold">[TAPE]</span>}
-            <span>{dream.dateLabel}</span>
-            <span>•</span>
-            <span>{dream.timeLabel}</span>
+        {/* Zero-Pill Header Metadata */}
+        <div className="flex items-center justify-between text-xs opacity-65">
+          <div className="flex items-center space-x-2">
+            <span className="font-medium">{dream.category}</span>
+            <span aria-hidden="true">·</span>
+            <span className="font-mono tabular-nums">{dream.dateLabel}</span>
+            <span aria-hidden="true">·</span>
+            <span className="font-mono tabular-nums">{dream.timeLabel}</span>
           </div>
-          <span 
-            className="text-[10px] font-medium px-2 py-0.5 rounded-full"
-            style={{
-              backgroundColor: currentStyle.colors.bg,
-              color: currentStyle.colors.textPrimary,
-              border: `1px solid ${currentStyle.colors.border}`,
-            }}
-          >
-            {dream.category}
-          </span>
+          {currentStyle.id === 'vintage' && (
+            <span className="font-mono text-xs font-bold text-red-500">[REC]</span>
+          )}
         </div>
 
+        {/* Clean Editorial Title */}
         <h4 
-          className={`${currentStyle.typography.headingFont} text-base font-bold transition-colors group-hover:opacity-80`}
+          className={`${currentStyle.typography.headingFont} text-base font-semibold tracking-wide transition-colors group-hover:opacity-80`}
           style={{ color: currentStyle.colors.textPrimary }}
         >
           {dream.title}
         </h4>
 
+        {/* Summary */}
         <p className="text-xs opacity-75 line-clamp-2 leading-relaxed">
           {dream.summary}
         </p>
 
-        <div className="flex items-center justify-between pt-1 text-[11px] opacity-80">
-          <div className="flex items-center space-x-1.5 flex-wrap">
+        {/* Clean Metadata Footer */}
+        <div className="flex items-center justify-between pt-1.5 text-xs border-t border-black/5 dark:border-white/5">
+          <div className="flex items-center space-x-2 opacity-70 flex-wrap">
             {dream.motifs.slice(0, 3).map((m, i) => (
-              <span 
-                key={i} 
-                className="px-1.5 py-0.5 rounded border text-[10px] font-handwriting"
-                style={{
-                  backgroundColor: currentStyle.colors.bg,
-                  borderColor: currentStyle.colors.border,
-                }}
-              >
-                #{m}
-              </span>
+              <span key={i} className="text-[11px]">#{m}</span>
             ))}
             {dream.comicStrip && (
-              <span className="font-handwriting font-bold text-[10px] text-amber-900 dark:text-amber-200 bg-amber-100/90 dark:bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-300 dark:border-amber-700 inline-flex items-center space-x-1">
-                <MangaFrameEmblem size={13} />
-                <span>4コマあり</span>
+              <span className="inline-flex items-center space-x-1 text-amber-700 dark:text-amber-300 font-medium text-[11px]">
+                <BookOpen className="w-3 h-3" />
+                <span>4コマ</span>
               </span>
             )}
           </div>
           <div className="flex items-center space-x-2">
-            <span className="font-handwriting font-bold text-xs" style={{ color: currentStyle.colors.accent }}>
+            <span className="text-[11px] font-mono tabular-nums opacity-60">
               シュール度 {dream.parameters.surrealism}%
             </span>
           </div>
@@ -498,125 +527,47 @@ function MainAppContent() {
     switch (activeTab) {
       case 'home':
         return (
-          <div className="pb-28 p-4 space-y-4 animate-in fade-in duration-200">
-            {/* Style Direction Banner */}
-            <div 
-              onClick={() => {
-                audioEngine.playMechanicalClick('high');
-                openStyleSelector();
-              }}
-              className="p-3.5 rounded-2xl border flex items-center justify-between shadow-2xs transition-all cursor-pointer hover:opacity-90 active:scale-98"
-              style={{
-                backgroundColor: currentStyle.colors.cardBg,
-                borderColor: currentStyle.colors.border,
-              }}
-            >
-              <div className="flex items-center space-x-2.5">
-                <div 
-                  className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-2xs"
-                  style={{
-                    backgroundColor: currentStyle.colors.accent + '20',
-                    color: currentStyle.colors.accent,
-                  }}
-                >
-                  <Palette className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="text-xs font-bold flex items-center space-x-1.5">
-                    <span>デザイン造形: {currentStyle.name}</span>
-                    <span 
-                      className="text-[9px] px-1.5 py-0.2 rounded-full font-bold"
-                      style={{
-                        backgroundColor: currentStyle.colors.accent,
-                        color: currentStyle.colors.recordBtnText || '#fff',
-                      }}
-                    >
-                      変更
-                    </span>
-                  </div>
-                  <div className="text-[10px] opacity-70">
-                    装飾アセット・造形・世界観の4パターンをリアルタイム切替
-                  </div>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 opacity-50" />
-            </div>
-
-            {/* Style-Specific Hero Recording Area */}
+          <div className="pb-28 p-5 space-y-5 animate-in fade-in duration-200">
+            {/* Style-Specific Hero Recording Area (Integrated with Next Alarm) */}
             {renderHeroRecorder()}
 
-            {/* Walking Mascot Lane (Baku & Sheep) with Interactive Fun */}
-            <MascotWalkLane
-              onRecordClick={() => {
-                audioEngine.playMechanicalClick('high');
-                setIsAlarmTriggered(false);
-                setIsVoiceModalOpen(true);
-              }}
-            />
-
-            {/* Next Alarm Info Banner */}
+            {/* Quiet Baku Mascot Companion Card */}
             <div 
-              className="rounded-2xl p-3.5 border flex items-center justify-between shadow-2xs transition-colors"
+              className="p-3.5 rounded-2xl border flex items-center space-x-3 transition-colors shadow-xs"
               style={{
                 backgroundColor: currentStyle.colors.cardBg,
                 borderColor: currentStyle.colors.border,
               }}
             >
-              <div className="flex items-center space-x-3">
-                <div 
-                  className="w-9 h-9 rounded-xl flex items-center justify-center"
-                  style={{
-                    backgroundColor: currentStyle.colors.bg,
-                    color: currentStyle.colors.textPrimary,
-                  }}
-                >
-                  <Bell className="w-4 h-4" style={{ color: currentStyle.colors.accent }} />
-                </div>
-                <div>
-                  <div className="text-xs font-bold">
-                    次回アラーム {settings.alarmTime}
-                  </div>
-                  <div className="text-[10px] opacity-70">
-                    アラーム後に自動で記録画面を起動
-                  </div>
-                </div>
+              <div className="shrink-0">
+                <BakuMascot size="sm" isWalking={false} showSpeech={false} />
               </div>
-              <button
-                onClick={() => {
-                  audioEngine.playMechanicalClick('high');
-                  setIsAlarmModalOpen(true);
-                }}
-                className="text-xs font-bold px-3 py-1.5 rounded-lg transition-all cursor-pointer border"
-                style={{
-                  backgroundColor: currentStyle.colors.bg,
-                  borderColor: currentStyle.colors.border,
-                  color: currentStyle.colors.textPrimary,
-                }}
-              >
-                試す
-              </button>
+              <div className="flex-1 space-y-0.5">
+                <span className="font-semibold text-xs block" style={{ color: currentStyle.colors.textPrimary }}>
+                  バクくんの夢あつめの手帖
+                </span>
+                <p className="text-xs opacity-75 leading-relaxed">
+                  起きたばかりの断片的なつぶやきでOK。AIが4コマや標本に仕立てます。
+                </p>
+              </div>
             </div>
 
-            {/* Recent Dreams List with Handwritten Flair */}
+            {/* Recent Dreams List with Zero-Pill Architecture */}
             <div className="space-y-3 pt-1">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <h3 
-                    className={`${currentStyle.typography.headingFont} text-base font-bold flex items-center`}
-                    style={{ color: currentStyle.colors.accentSecondary }}
-                  >
-                    <BookOpen className="w-4 h-4 mr-1.5" style={{ color: currentStyle.colors.accent }} />
-                    最近の夢日記
-                  </h3>
-                  <CuteStamp text="AI採集帖" color={currentStyle.colors.accent} />
-                </div>
+                <h3 
+                  className={`${currentStyle.typography.headingFont} text-base font-semibold flex items-center`}
+                  style={{ color: currentStyle.colors.textPrimary }}
+                >
+                  <BookOpen className="w-4 h-4 mr-2" style={{ color: currentStyle.colors.accent }} />
+                  最近の夢日記
+                </h3>
                 <button
                   onClick={() => {
                     audioEngine.playMechanicalClick('high');
                     setActiveTab('my-dreams');
                   }}
-                  className="text-xs font-medium flex items-center hover:opacity-80 transition-opacity cursor-pointer font-handwriting"
-                  style={{ color: currentStyle.colors.accent }}
+                  className="text-xs opacity-70 hover:opacity-100 flex items-center transition-opacity cursor-pointer"
                 >
                   <span>すべて見る</span>
                   <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
@@ -624,19 +575,6 @@ function MainAppContent() {
               </div>
 
               {dreams.slice(0, 3).map((dream) => renderDreamCard(dream))}
-
-              {/* Handwritten Post-It Advice Note */}
-              <HandwrittenPostIt color="yellow" rotation="rotate-[1deg]" className="mt-3">
-                <div className="flex items-start space-x-2.5">
-                  <LightbulbIdeaAsset size={20} className="shrink-0 mt-0.5" />
-                  <div className="text-xs leading-relaxed">
-                    <div className="font-bold text-amber-950 font-warm">バクくんの夢あつめのヒント：</div>
-                    <div className="text-amber-900/90 mt-0.5 font-handwriting">
-                      「目覚めた直後のベッドの中が一番記憶が鮮やかだよ。単語のつぶやきだけでも、AIが物語と4コマに仕立てるから気軽に吹き込んでね！」
-                    </div>
-                  </div>
-                </div>
-              </HandwrittenPostIt>
             </div>
           </div>
         );

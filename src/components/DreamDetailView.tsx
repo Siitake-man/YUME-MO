@@ -33,10 +33,10 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
   const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
 
   return (
-    <div className="pb-24 max-w-lg mx-auto animate-in fade-in duration-200">
+    <div className="pb-24 w-full max-w-xl md:max-w-2xl mx-auto animate-in fade-in duration-200">
       {/* Top Bar */}
       <div 
-        className="sticky top-0 z-30 backdrop-blur-md px-4 py-3 border-b flex items-center justify-between transition-colors"
+        className="sticky top-0 z-30 backdrop-blur-md px-5 py-3.5 border-b flex items-center justify-between transition-colors"
         style={{
           backgroundColor: currentStyle.colors.navBg,
           borderColor: currentStyle.colors.border,
@@ -47,7 +47,7 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
             audioEngine.playMechanicalClick('low');
             onBack();
           }}
-          className="flex items-center space-x-1.5 text-xs font-bold py-1 px-2 rounded-lg transition-colors cursor-pointer hover:opacity-80"
+          className="flex items-center space-x-1.5 text-xs font-medium py-1 px-2 rounded-lg transition-colors cursor-pointer hover:opacity-80"
           style={{ color: currentStyle.colors.textPrimary }}
         >
           <ArrowLeft className="w-4 h-4" />
@@ -62,7 +62,7 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
               audioEngine.playThemeSound(currentStyle.id, 'action');
               setIsShareModalOpen(true);
             }}
-            className="flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-bold border shadow-xs transition-all cursor-pointer hover:opacity-90 active:scale-95"
+            className="flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-medium border shadow-xs transition-all cursor-pointer hover:opacity-90 active:scale-95"
             style={{
               backgroundColor: currentStyle.colors.accent,
               borderColor: currentStyle.colors.accent,
@@ -80,7 +80,7 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
               audioEngine.playMechanicalClick('high');
               onTogglePublic(dream.id);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer"
+            className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-all cursor-pointer"
             style={{
               backgroundColor: dream.isPublic ? currentStyle.colors.accent + '20' : currentStyle.colors.cardBg,
               borderColor: dream.isPublic ? currentStyle.colors.accent : currentStyle.colors.border,
@@ -106,7 +106,7 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
               audioEngine.playMechanicalClick('low');
               setShowDeleteConfirm(true);
             }}
-            className="w-8 h-8 rounded-full flex items-center justify-center opacity-50 hover:opacity-100 hover:text-red-500 transition-all cursor-pointer"
+            className="w-8 h-8 rounded-lg flex items-center justify-center opacity-50 hover:opacity-100 hover:text-red-500 transition-all cursor-pointer"
             title="削除"
           >
             <Trash2 className="w-4 h-4" />
@@ -116,7 +116,7 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
 
       {/* Delete Confirm Alert */}
       {showDeleteConfirm && (
-        <div className="mx-4 mt-3 p-3.5 bg-red-900/20 border border-red-500/30 rounded-2xl flex items-center justify-between text-xs text-red-300 animate-in fade-in">
+        <div className="mx-5 mt-3 p-3.5 bg-red-900/20 border border-red-500/30 rounded-2xl flex items-center justify-between text-xs text-red-300 animate-in fade-in">
           <span>この夢の記録を削除しますか？</span>
           <div className="flex items-center space-x-2">
             <button
@@ -136,10 +136,10 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
       )}
 
       {/* Content Container */}
-      <div className="p-4 space-y-4">
+      <div className="p-5 space-y-5">
         {/* Title Header Card */}
         <div 
-          className="rounded-2xl p-5 border shadow-2xs space-y-3 transition-colors relative overflow-hidden"
+          className="rounded-2xl p-5 border shadow-xs space-y-3 transition-colors relative overflow-hidden"
           style={{
             backgroundColor: currentStyle.colors.cardBg,
             borderColor: currentStyle.colors.border,
@@ -151,38 +151,24 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
             </div>
           )}
 
-          <div className="flex items-center justify-between text-xs font-mono opacity-70">
-            <div className="flex items-center space-x-2">
-              <span className="flex items-center">
-                <Calendar className="w-3.5 h-3.5 mr-1" style={{ color: currentStyle.colors.accent }} />
-                {dream.dateLabel}
-              </span>
-              <span>•</span>
-              <span className="flex items-center">
-                <Clock className="w-3.5 h-3.5 mr-1" style={{ color: currentStyle.colors.accent }} />
-                {dream.timeLabel} 起床
-              </span>
-            </div>
-            <span 
-              className="px-2.5 py-0.5 rounded-full text-[11px] font-sans font-medium border"
-              style={{
-                backgroundColor: currentStyle.colors.bg,
-                borderColor: currentStyle.colors.border,
-              }}
-            >
-              {dream.category}
-            </span>
+          {/* Zero-Pill Metadata Header */}
+          <div className="flex items-center gap-2 text-xs opacity-65 flex-wrap">
+            <span className="font-medium">{dream.category}</span>
+            <span aria-hidden="true">·</span>
+            <span className="font-mono tabular-nums">{dream.dateLabel}</span>
+            <span aria-hidden="true">·</span>
+            <span className="font-mono tabular-nums">{dream.timeLabel} 起床</span>
           </div>
 
           <h1 
-            className={`${currentStyle.typography.headingFont} text-xl sm:text-2xl font-bold leading-tight`}
+            className={`${currentStyle.typography.headingFont} text-2xl font-bold leading-snug`}
             style={{ color: currentStyle.colors.textPrimary }}
           >
             {dream.title}
           </h1>
 
           <p 
-            className="text-sm leading-relaxed p-3.5 rounded-xl border"
+            className="text-sm leading-relaxed p-4 rounded-xl border opacity-90"
             style={{
               backgroundColor: currentStyle.colors.bg,
               borderColor: currentStyle.colors.border,
@@ -193,52 +179,39 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
           </p>
 
           {/* Baku Mascot's Taste Review Post-it */}
-          <HandwrittenPostIt color="blue" rotation="rotate-[-1deg]" className="my-1">
-            <div className="flex items-start space-x-2.5">
-              <div className="shrink-0 -mt-1">
-                <BakuMascot size={44} showSpeech={false} />
-              </div>
-              <div className="text-xs leading-relaxed">
-                <div className="font-bold text-indigo-950 flex items-center space-x-1.5">
-                  <span>バクくんの夢ソムリエ講評</span>
-                  <CuteStamp text="美味" color="#4F46E5" />
-                </div>
-                <div className="text-indigo-900/90 mt-0.5">
-                  「今日の夢はシュール度{dream.parameters.surrealism}%！『{dream.motifs[0] || '情景'}』の余韻がとても香ばしくてごちそうさまでした♪」
-                </div>
-              </div>
+          <div 
+            className="p-3.5 rounded-xl border flex items-start space-x-3 transition-colors"
+            style={{
+              backgroundColor: currentStyle.colors.bg,
+              borderColor: currentStyle.colors.border,
+            }}
+          >
+            <div className="shrink-0 -mt-0.5">
+              <BakuMascot size={36} showSpeech={false} />
             </div>
-          </HandwrittenPostIt>
+            <div className="text-xs leading-relaxed">
+              <span className="font-semibold block text-[11px] opacity-75">
+                バクくんの夢ソムリエ講評
+              </span>
+              <p className="mt-0.5 opacity-85">
+                「今日の夢はシュール度{dream.parameters.surrealism}%！『{dream.motifs[0] || '情景'}』の余韻がとても香ばしくてごちそうさまでした」
+              </p>
+            </div>
+          </div>
 
           {/* Motifs and Characters */}
-          <div className="flex flex-wrap gap-1.5 pt-1">
+          <div className="flex flex-wrap items-center gap-2 pt-1 text-xs opacity-75">
             {dream.motifs.map((motif, idx) => (
-              <span
-                key={idx}
-                className="text-xs px-2.5 py-1 rounded-full border flex items-center space-x-1"
-                style={{
-                  backgroundColor: currentStyle.colors.bg,
-                  borderColor: currentStyle.colors.border,
-                  color: currentStyle.colors.textPrimary,
-                }}
-              >
-                <Tag className="w-3 h-3" style={{ color: currentStyle.colors.accent }} />
-                <span>{motif}</span>
+              <span key={idx} className="font-mono">
+                #{motif}
               </span>
             ))}
-            {dream.characters.map((char, idx) => (
-              <span
-                key={`c-${idx}`}
-                className="text-xs px-2.5 py-1 rounded-full border flex items-center space-x-1"
-                style={{
-                  backgroundColor: currentStyle.colors.accentSecondary + '20',
-                  borderColor: currentStyle.colors.accentSecondary + '40',
-                }}
-              >
-                <User className="w-3 h-3" style={{ color: currentStyle.colors.accent }} />
-                <span>{char}</span>
-              </span>
-            ))}
+            {dream.characters && dream.characters.length > 0 && (
+              <>
+                <span aria-hidden="true" className="opacity-40">·</span>
+                <span className="opacity-60">登場人物: {dream.characters.join(', ')}</span>
+              </>
+            )}
           </div>
         </div>
 

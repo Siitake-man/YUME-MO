@@ -42,12 +42,12 @@ export const DreamGalleryView: React.FC<DreamGalleryViewProps> = ({
   });
 
   return (
-    <div className="pb-28 max-w-lg mx-auto p-4 space-y-4 animate-in fade-in duration-200">
+    <div className="pb-28 w-full max-w-xl md:max-w-2xl mx-auto p-5 space-y-5 animate-in fade-in duration-200">
       {/* Gallery Header */}
       <div className="space-y-1">
         <div className="flex items-center space-x-2">
           <div 
-            className="w-7 h-7 rounded-sm flex items-center justify-center shadow-xs"
+            className="w-7 h-7 rounded-lg flex items-center justify-center shadow-xs"
             style={{
               backgroundColor: currentStyle.colors.accentSecondary,
               color: currentStyle.colors.accent,
@@ -57,19 +57,19 @@ export const DreamGalleryView: React.FC<DreamGalleryViewProps> = ({
           </div>
           <h2 
             className={`${currentStyle.typography.headingFont} text-xl font-bold`}
-            style={{ color: currentStyle.colors.accentSecondary }}
+            style={{ color: currentStyle.colors.textPrimary }}
           >
             夢の標本図鑑
           </h2>
         </div>
-        <p className="text-xs opacity-75 leading-relaxed">
-          誰かが今朝、消えゆく直前に捕まえた不思議な世界のコレクション。
+        <p className="text-xs opacity-70 leading-relaxed">
+          誰かが今朝、消えゆく直前に捕まえた無意識のコレクション。
         </p>
       </div>
 
       {/* Dream Neko Specimen Curator Card */}
       <div 
-        className="rounded-3xl p-3.5 border shadow-sm relative overflow-hidden flex items-center space-x-3 transition-colors"
+        className="rounded-2xl p-3.5 border shadow-xs flex items-center space-x-3 transition-colors"
         style={{
           backgroundColor: currentStyle.colors.cardBg,
           borderColor: currentStyle.colors.border,
@@ -78,21 +78,18 @@ export const DreamGalleryView: React.FC<DreamGalleryViewProps> = ({
         <div className="shrink-0">
           <NekoMascot size="sm" isWalking={true} showSpeech={false} />
         </div>
-        <div className="flex-1 space-y-1">
-          <div className="flex items-center space-x-2">
-            <span className="font-handwriting font-bold text-xs text-neutral-800 dark:text-neutral-200">
-              夢ねこさんの標本番
-            </span>
-            <CuteStamp text="収蔵中" color="#EA580C" />
-          </div>
-          <p className="font-handwriting text-[11px] text-neutral-600 dark:text-neutral-300 leading-snug">
-            「みんなの夢の標本が{publicDreams.length}個あつまってるニャ！雲の上で丸くなりながら読ませてもらうニャ〜」
+        <div className="flex-1 space-y-0.5">
+          <span className="font-semibold text-xs block" style={{ color: currentStyle.colors.textPrimary }}>
+            夢ねこさんの標本番 · 収蔵中
+          </span>
+          <p className="text-xs opacity-75 leading-snug">
+            「みんなの夢の標本が{publicDreams.length}個あつまってるニャ。雲の上で丸くなりながら読ませてもらうニャ〜」
           </p>
         </div>
       </div>
 
       {/* Search and Category Filter */}
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         <div className="relative">
           <Search className="w-4 h-4 opacity-50 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -109,8 +106,8 @@ export const DreamGalleryView: React.FC<DreamGalleryViewProps> = ({
           />
         </div>
 
-        {/* Category Pills */}
-        <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar py-1">
+        {/* Clean Segmented Filter Bar */}
+        <div className="flex items-center space-x-1 overflow-x-auto no-scrollbar py-1">
           {CATEGORIES.map((cat) => {
             const isSelected = selectedCategory === cat;
             return (
@@ -120,7 +117,9 @@ export const DreamGalleryView: React.FC<DreamGalleryViewProps> = ({
                   audioEngine.playMechanicalClick('high');
                   setSelectedCategory(cat);
                 }}
-                className="px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all cursor-pointer border"
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all cursor-pointer border ${
+                  isSelected ? 'shadow-xs' : 'opacity-70 hover:opacity-100'
+                }`}
                 style={{
                   backgroundColor: isSelected ? currentStyle.colors.accentSecondary : currentStyle.colors.cardBg,
                   borderColor: isSelected ? currentStyle.colors.accentSecondary : currentStyle.colors.border,
@@ -152,12 +151,12 @@ export const DreamGalleryView: React.FC<DreamGalleryViewProps> = ({
           </p>
         </div>
       ) : (
-        <div className="space-y-3.5">
+        <div className="space-y-4">
           {filteredDreams.map((dream, index) => {
             return (
               <React.Fragment key={dream.id}>
                 <div
-                  className="rounded-2xl p-4 border shadow-2xs hover:scale-[1.005] transition-all space-y-3 relative overflow-hidden"
+                  className="rounded-2xl p-4 border shadow-xs hover:border-slate-400/40 transition-all space-y-2.5 relative overflow-hidden"
                   style={{
                     backgroundColor: currentStyle.colors.cardBg,
                     borderColor: currentStyle.colors.border,
@@ -170,32 +169,14 @@ export const DreamGalleryView: React.FC<DreamGalleryViewProps> = ({
                     </div>
                   )}
 
-                  {/* Author and Date Header */}
-                  <div className="flex items-center justify-between text-xs opacity-75">
-                    <div className="flex items-center space-x-1.5">
-                      <div 
-                        className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold border"
-                        style={{
-                          backgroundColor: currentStyle.colors.accent + '20',
-                          borderColor: currentStyle.colors.accent + '40',
-                          color: currentStyle.colors.accent,
-                        }}
-                      >
-                        {dream.authorName?.[0] || '標'}
-                      </div>
+                  {/* Zero-Pill Author and Date Header */}
+                  <div className="flex items-center justify-between text-xs opacity-65">
+                    <div className="flex items-center space-x-2">
                       <span className="font-medium font-serif">{dream.authorName || '記録者'}</span>
-                      <span>•</span>
-                      <span className="font-mono text-[11px]">{dream.dateLabel}</span>
+                      <span aria-hidden="true">·</span>
+                      <span className="font-mono text-[11px] tabular-nums">{dream.dateLabel}</span>
                     </div>
-                    <span 
-                      className="px-2 py-0.5 rounded-full text-[10px] font-medium border"
-                      style={{
-                        backgroundColor: currentStyle.colors.bg,
-                        borderColor: currentStyle.colors.border,
-                      }}
-                    >
-                      {dream.category}
-                    </span>
+                    <span className="font-medium text-[11px]">{dream.category}</span>
                   </div>
 
                   {/* Card Main Title and Summary */}
@@ -207,7 +188,7 @@ export const DreamGalleryView: React.FC<DreamGalleryViewProps> = ({
                     className="cursor-pointer group"
                   >
                     <h3 
-                      className={`${currentStyle.typography.headingFont} text-base font-bold transition-colors group-hover:opacity-80`}
+                      className={`${currentStyle.typography.headingFont} text-base font-semibold tracking-wide transition-colors group-hover:opacity-80`}
                       style={{ color: currentStyle.colors.textPrimary }}
                     >
                       {dream.title}
@@ -217,32 +198,17 @@ export const DreamGalleryView: React.FC<DreamGalleryViewProps> = ({
                     </p>
                   </div>
 
-                  {/* Motifs Tags */}
-                  <div className="flex flex-wrap gap-1">
+                  {/* Clean Motifs Metadata */}
+                  <div className="flex items-center space-x-2 text-xs opacity-70 flex-wrap">
                     {dream.motifs.slice(0, 4).map((motif, idx) => (
-                      <span
-                        key={idx}
-                        className="text-[11px] px-2 py-0.5 rounded-md border"
-                        style={{
-                          backgroundColor: currentStyle.colors.bg,
-                          borderColor: currentStyle.colors.border,
-                          color: currentStyle.colors.textPrimary,
-                        }}
-                      >
+                      <span key={idx} className="font-mono text-[11px]">
                         #{motif}
                       </span>
                     ))}
                     {dream.comicStrip && (
-                      <span 
-                        className="text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center border"
-                        style={{
-                          backgroundColor: currentStyle.colors.accent + '20',
-                          borderColor: currentStyle.colors.accent + '40',
-                          color: currentStyle.colors.accent,
-                        }}
-                      >
-                        <MangaFrameEmblem size={12} className="mr-1" />
-                        4コマ有
+                      <span className="inline-flex items-center space-x-1 text-amber-700 dark:text-amber-300 font-medium text-[11px]">
+                        <BookOpen className="w-3 h-3" />
+                        <span>4コマ</span>
                       </span>
                     )}
                   </div>
