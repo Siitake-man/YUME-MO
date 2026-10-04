@@ -10,6 +10,7 @@ import { StorybookDecorations } from './Decorations';
 import { BakuMascot } from './DreamMascots';
 import { HandwrittenPostIt, CuteStamp } from './PlayfulAccents';
 import { SpeechBubbleTaleAsset, SparkleAsset, MangaFrameEmblem, MoonCrestAsset } from './IllustratedAssets';
+import { DreamShareModal } from './DreamShareModal';
 
 interface DreamDetailViewProps {
   dream: DreamRecord;
@@ -29,6 +30,7 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
   const { currentStyle } = useUIStyle();
   const [showRawTranscription, setShowRawTranscription] = useState<boolean>(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
 
   return (
     <div className="pb-24 max-w-lg mx-auto animate-in fade-in duration-200">
@@ -53,6 +55,25 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
         </button>
 
         <div className="flex items-center space-x-2">
+          {/* Share Button */}
+          <button
+            id="dream-detail-top-share-btn"
+            onClick={() => {
+              audioEngine.playThemeSound(currentStyle.id, 'action');
+              setIsShareModalOpen(true);
+            }}
+            className="flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-bold border shadow-xs transition-all cursor-pointer hover:opacity-90 active:scale-95"
+            style={{
+              backgroundColor: currentStyle.colors.accent,
+              borderColor: currentStyle.colors.accent,
+              color: currentStyle.colors.recordBtnText || '#FFFFFF',
+            }}
+            title="SNSやクリップボードで共有"
+          >
+            <Share2 className="w-3.5 h-3.5" />
+            <span>共有</span>
+          </button>
+
           {/* Public / Private Status Toggle */}
           <button
             onClick={() => {
@@ -437,7 +458,57 @@ export const DreamDetailView: React.FC<DreamDetailViewProps> = ({
             </div>
           )}
         </div>
+
+        {/* Share Callout Banner */}
+        <div 
+          className="rounded-2xl p-4 border flex items-center justify-between shadow-2xs transition-colors"
+          style={{
+            backgroundColor: currentStyle.colors.cardBg,
+            borderColor: currentStyle.colors.border,
+          }}
+        >
+          <div className="flex items-center space-x-3">
+            <div 
+              className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+              style={{
+                backgroundColor: currentStyle.colors.accent + '20',
+                color: currentStyle.colors.accent,
+              }}
+            >
+              <Share2 className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="font-bold text-xs block">この夢をSNSでシェア</span>
+              <span className="text-[10px] opacity-70">
+                {dream.comicStrip ? '4コマ画像や夢カードを画像コピー・𝕏投稿' : '正方形カード画像を画像コピー・𝕏投稿'}
+              </span>
+            </div>
+          </div>
+
+          <button
+            id="dream-detail-bottom-share-btn"
+            onClick={() => {
+              audioEngine.playThemeSound(currentStyle.id, 'action');
+              setIsShareModalOpen(true);
+            }}
+            className="py-2 px-3.5 rounded-xl text-xs font-bold shadow-xs transition-all flex items-center space-x-1 cursor-pointer active:scale-95 hover:opacity-90 shrink-0"
+            style={{
+              backgroundColor: currentStyle.colors.accent,
+              color: currentStyle.colors.recordBtnText || '#FFFFFF',
+            }}
+          >
+            <Share2 className="w-3.5 h-3.5 mr-0.5" />
+            <span>共有する</span>
+          </button>
+        </div>
       </div>
+
+      {/* Share Modal */}
+      <DreamShareModal
+        isOpen={isShareModalOpen}
+        dream={dream}
+        onClose={() => setIsShareModalOpen(false)}
+      />
     </div>
   );
 };

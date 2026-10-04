@@ -1,19 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, Square, Sparkles, Volume2, ArrowRight, X, Edit3, Disc, Play, Radio, Bookmark } from 'lucide-react';
+import { 
+  Mic, Square, Sparkles, Volume2, ArrowRight, X, Edit3, Disc, Play, 
+  Radio, Bookmark, Fingerprint, RefreshCw, Wand2, Check, AlertCircle 
+} from 'lucide-react';
 import { useUIStyle } from '../context/UIStyleContext';
-import { StorybookDecorations, CelestialDecorations, GlassSpecimenDecorations, RetroCassetteDecorations } from './Decorations';
+import { AppSettings } from '../types';
+import { StorybookDecorations, CelestialDecorations, RetroCassetteDecorations } from './Decorations';
 import { audioEngine } from '../utils/audioEngine';
 import { MascotListeningBadge } from './DreamMascots';
+import { cleanAndDeduplicateTranscript, hasExcessiveRepetition } from '../utils/textCleaner';
 
 interface VoiceRecordModalProps {
   isOpen: boolean;
   onClose: () => void;
   onTranscriptionComplete: (text: string, durationSec: number) => void;
   isAlarmTriggered?: boolean;
+  settings: AppSettings;
+  onOpenVoiceprintTuning?: () => void;
 }
 
 // Preset quick voice simulations for users who cannot speak right now
 const PRESET_DREAM_VOICES = [
+  {
+    category: '日常・水族館',
+    label: 'しおちゃんと水族館の夢',
+    text: 'しおちゃんと水族館に行って、新しい巨大水槽を見ました。青い光の中でイルカがゆっくり泳いでいて、とても綺麗でいい夢を見ました。',
+    duration: 20,
+  },
   {
     category: '職場・航海',
     label: '猫部長とラーメン会議の夢',
@@ -21,22 +34,16 @@ const PRESET_DREAM_VOICES = [
     duration: 28,
   },
   {
-    category: '日常・天体',
-    label: '深夜コンビニと大根店員の夢',
-    text: '深夜のコンビニに入ったら店員がおでんの大根で、レジで「自分を温めてください」って言われた。店から出たらコンビニ全体がゆっくり夜空に浮上して、星の間を飛んで宇宙に行った。',
-    duration: 22,
-  },
-  {
-    category: '過去・逆行',
-    label: '逆再生の運動会と紙飛行機',
-    text: '小学校の運動会で徒競走を走ってたら、全員が後ろ向きに逆再生で走ってて、ゴールからスタートラインに向かってた。応援団がみんな紙飛行機を口から吸い込んでて不思議だった。',
-    duration: 25,
-  },
-  {
     category: '浮遊・情景',
     label: '空飛ぶ珈琲カップと雲のカフェ',
     text: '巨大なマグカップに乗って朝の空を飛んでた。雲をスプーンですくって食べたら綿あめの味で、空の上にある木造の喫茶店で誰かがピアノを弾いてた。',
     duration: 19,
+  },
+  {
+    category: '日常・天体',
+    label: '深夜コンビニと大根店員の夢',
+    text: '深夜のコンビニに入ったら店員がおでんの大根で、レジで「自分を温めてください」って言われた。店から出たらコンビニ全体がゆっくり夜空に浮上して、星の間を飛んで宇宙に行った。',
+    duration: 22,
   }
 ];
 
@@ -45,6 +52,8 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
   onClose,
   onTranscriptionComplete,
   isAlarmTriggered = false,
+  settings,
+  onOpenVoiceprintTuning,
 }) => {
   const { currentStyle } = useUIStyle();
   const [isRecording, setIsRecording] = useState<boolean>(false);
@@ -55,10 +64,18 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
   const [isManualTextMode, setIsManualTextMode] = useState<boolean>(false);
   const [audioLevel, setAudioLevel] = useState<number[]>(new Array(16).fill(10));
   const [activeTapeKey, setActiveTapeKey] = useState<string>('stop');
+  const [isAiRefining, setIsAiRefining] = useState<boolean>(false);
+  const [aiRefineNotice, setAiRefineNotice] = useState<string | null>(null);
 
   const recognitionRef = useRef<any>(null);
   const timerRef = useRef<any>(null);
   const audioIntervalRef = useRef<any>(null);
+  const finalTranscriptRef = useRef<string>('');
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const recordedAudioBase64Ref = useRef<string | null>(null);
+
+  const voiceKeywords = settings?.voiceprintProfile?.frequentKeywords || ['しおちゃん', '水族館', '猫'];
 
   // Initialize SpeechRecognition if available in browser
   useEffect(() => {
@@ -72,11 +89,28 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
         recognition.lang = 'ja-JP';
 
         recognition.onresult = (event: any) => {
-          let currentText = '';
-          for (let i = 0; i < event.results.length; i++) {
-            currentText += event.results[i][0].transcript;
+          let interimText = '';
+
+          // Loop only from resultIndex onwards to prevent duplicate concatenation
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            const res = event.results[i];
+            if (res.isFinal) {
+              const phrase = res[0].transcript;
+              // Prevent appending exact duplicate final phrase
+              if (!finalTranscriptRef.current.endsWith(phrase)) {
+                finalTranscriptRef.current += phrase;
+              }
+            } else {
+              interimText += res[0].transcript;
+            }
           }
-          setTranscribedText(currentText);
+
+          // Combine finalized segments with current interim phrase
+          const rawCombined = finalTranscriptRef.current + (interimText ? ` ${interimText}` : '');
+          
+          // Apply immediate real-time de-duplication to eliminate Android Chrome repetition loops
+          const cleaned = cleanAndDeduplicateTranscript(rawCombined, voiceKeywords);
+          setTranscribedText(cleaned);
         };
 
         recognition.onerror = (event: any) => {
@@ -96,15 +130,19 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
     return () => {
       stopRecording();
     };
-  }, []);
+  }, [settings?.voiceprintProfile]);
 
   // Reset when opening
   useEffect(() => {
     if (isOpen) {
       setTranscribedText('');
+      finalTranscriptRef.current = '';
+      recordedAudioBase64Ref.current = null;
       setRecordSeconds(0);
       setIsRecording(false);
       setIsManualTextMode(false);
+      setIsAiRefining(false);
+      setAiRefineNotice(null);
       setActiveTapeKey('stop');
     } else {
       stopRecording();
@@ -129,7 +167,7 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
     };
   }, [isRecording]);
 
-  const startRecording = () => {
+  const startRecording = async () => {
     audioEngine.playMechanicalClick('high');
     if (currentStyle.id === 'vintage') {
       audioEngine.startTapeHiss();
@@ -138,13 +176,42 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
     setIsRecording(true);
     setActiveTapeKey('rec');
     setRecordSeconds(0);
+    finalTranscriptRef.current = '';
+    setTranscribedText('');
+    setAiRefineNotice(null);
 
+    // 1. Start browser speech recognition
     if (recognitionRef.current) {
       try {
         recognitionRef.current.start();
       } catch (e) {
         console.warn('Recognition start caught error:', e);
       }
+    }
+
+    // 2. Concurrently record raw audio using MediaRecorder for AI voiceprint analysis
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioChunksRef.current = [];
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          audioChunksRef.current.push(e.data);
+        }
+      };
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          recordedAudioBase64Ref.current = reader.result as string;
+        };
+        reader.readAsDataURL(audioBlob);
+        stream.getTracks().forEach(t => t.stop());
+      };
+      mediaRecorder.start();
+      mediaRecorderRef.current = mediaRecorder;
+    } catch (err) {
+      console.warn('MediaRecorder not started:', err);
     }
 
     timerRef.current = setInterval(() => {
@@ -157,10 +224,12 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
     audioEngine.stopTapeHiss();
     setIsRecording(false);
     setActiveTapeKey('stop');
+
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
+
     if (recognitionRef.current) {
       try {
         recognitionRef.current.stop();
@@ -168,6 +237,73 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
         // ignore
       }
     }
+
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      try {
+        mediaRecorderRef.current.stop();
+      } catch (e) {
+        // ignore
+      }
+      mediaRecorderRef.current = null;
+    }
+
+    // Immediately run final deduplication & keyword alignment
+    setTranscribedText(prev => {
+      const cleaned = cleanAndDeduplicateTranscript(prev, voiceKeywords);
+      return cleaned;
+    });
+
+    // If auto AI refinement is active and text was captured, trigger optimization
+    if (settings?.voiceprintProfile?.autoAiRefinement && transcribedText.trim().length > 4) {
+      setTimeout(() => {
+        handleAiRefinement();
+      }, 300);
+    }
+  };
+
+  // Call Gemini Voiceprint AI & deduplication API
+  const handleAiRefinement = async () => {
+    const targetText = transcribedText.trim();
+    if (!targetText || isAiRefining) return;
+
+    audioEngine.playMechanicalClick('high');
+    setIsAiRefining(true);
+    setAiRefineNotice(null);
+
+    try {
+      const res = await fetch('/api/transcribe-voice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          rawDraft: targetText,
+          audioData: recordedAudioBase64Ref.current || undefined,
+          voiceprintProfile: settings?.voiceprintProfile,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.transcribedText) {
+          setTranscribedText(data.transcribedText);
+          setAiRefineNotice('声紋プロファイルとAIにより、重複除去・語彙補正を完了しました');
+        }
+      }
+    } catch (e) {
+      console.warn('AI Refine error, using local deduplicator:', e);
+      // Fallback local cleanup
+      const cleaned = cleanAndDeduplicateTranscript(targetText, voiceKeywords);
+      setTranscribedText(cleaned);
+    } finally {
+      setIsAiRefining(false);
+    }
+  };
+
+  // Immediate manual deduplicate button
+  const handleManualDeduplicate = () => {
+    audioEngine.playMechanicalClick('high');
+    const cleaned = cleanAndDeduplicateTranscript(transcribedText, voiceKeywords);
+    setTranscribedText(cleaned);
+    setAiRefineNotice('重複フレーズを整理しました');
   };
 
   const handleApplyPreset = (preset: typeof PRESET_DREAM_VOICES[0]) => {
@@ -175,13 +311,16 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
     setTranscribedText(preset.text);
     setRecordSeconds(preset.duration);
     setIsManualTextMode(true);
+    setAiRefineNotice(null);
   };
 
   const handleProceed = () => {
     if (!transcribedText.trim()) return;
     audioEngine.playMechanicalClick('high');
-    const duration = recordSeconds > 0 ? recordSeconds : Math.max(15, Math.floor(transcribedText.length / 5));
-    onTranscriptionComplete(transcribedText.trim(), duration);
+    // Ensure one final pass of clean deduplication before moving to comic/carte
+    const finalText = cleanAndDeduplicateTranscript(transcribedText.trim(), voiceKeywords);
+    const duration = recordSeconds > 0 ? recordSeconds : Math.max(15, Math.floor(finalText.length / 5));
+    onTranscriptionComplete(finalText, duration);
   };
 
   if (!isOpen) return null;
@@ -228,6 +367,26 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
               {String(recordSeconds % 60).padStart(2, '0')}
             </span>
           </div>
+
+          {/* Voiceprint profile indicator badge */}
+          {onOpenVoiceprintTuning && (
+            <button
+              onClick={() => {
+                audioEngine.playMechanicalClick('high');
+                onOpenVoiceprintTuning();
+              }}
+              className="hidden xs:flex items-center space-x-1 text-[10px] px-2 py-0.5 rounded-full border opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+              style={{
+                borderColor: currentStyle.colors.border,
+                backgroundColor: currentStyle.colors.bg,
+              }}
+              title="声紋プロファイル設定を開く"
+            >
+              <Fingerprint className="w-3 h-3 text-emerald-500" />
+              <span>声紋補正: {settings?.voiceprintProfile?.isCalibrated ? '学習済み' : '基本'}</span>
+            </button>
+          )}
+
           <button
             onClick={() => {
               audioEngine.playMechanicalClick('low');
@@ -241,7 +400,7 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
 
         {/* Modal Body */}
         <div className="p-5 overflow-y-auto space-y-4">
-          {/* Reassurance Message */}
+          {/* Reassurance Message with Voiceprint Hint */}
           <div 
             className="rounded-xl p-3.5 flex items-start space-x-3 border"
             style={{
@@ -256,12 +415,25 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
                 color: currentStyle.colors.accent,
               }}
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <Fingerprint className="w-3.5 h-3.5 text-emerald-500" />
             </div>
-            <div className="text-xs leading-relaxed opacity-90">
-              <p className="font-bold" style={{ color: currentStyle.colors.textPrimary }}>「まとまっていなくて大丈夫」</p>
+            <div className="text-xs leading-relaxed opacity-90 flex-1">
+              <div className="flex items-center justify-between">
+                <p className="font-bold" style={{ color: currentStyle.colors.textPrimary }}>
+                  声紋補正 & 重複防止機能が稼働中
+                </p>
+                {onOpenVoiceprintTuning && (
+                  <button
+                    onClick={onOpenVoiceprintTuning}
+                    className="text-[10px] underline cursor-pointer"
+                    style={{ color: currentStyle.colors.accent }}
+                  >
+                    声紋チューニング
+                  </button>
+                )}
+              </div>
               <p className="mt-0.5 opacity-75">
-                寝起きの一言、断片的な単語、不思議な人物だけでもOK。AIが物語として綺麗に整理します。
+                寝起きのぼそぼそ声や反復バグを自動除去。登録辞書（{voiceKeywords.slice(0, 3).join('・')}等）を優先認識します。
               </p>
             </div>
           </div>
@@ -353,7 +525,7 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
                 ))}
               </div>
 
-              {/* Cute Mascot Listening Badge */}
+              {/* Mascot Listening Badge */}
               <div className="w-full max-w-xs">
                 <MascotListeningBadge isRecording={isRecording} />
               </div>
@@ -361,13 +533,27 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
           ) : (
             /* Manual / Edited text input mode */
             <div className="space-y-2">
-              <label className="text-xs font-bold block" style={{ color: currentStyle.colors.textPrimary }}>
-                夢のテキスト（直接入力・編集可）
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold block" style={{ color: currentStyle.colors.textPrimary }}>
+                  夢のテキスト（直接入力・編集可）
+                </label>
+                <button
+                  onClick={handleManualDeduplicate}
+                  className="text-[10px] px-2 py-0.5 rounded-md border flex items-center space-x-1 hover:opacity-100 opacity-80 cursor-pointer"
+                  style={{
+                    borderColor: currentStyle.colors.border,
+                    backgroundColor: currentStyle.colors.bg,
+                  }}
+                  title="テキスト内の重複フレーズをワンタップで整理"
+                >
+                  <RefreshCw className="w-2.5 h-2.5" />
+                  <span>重複除去</span>
+                </button>
+              </div>
               <textarea
                 value={transcribedText}
                 onChange={(e) => setTranscribedText(e.target.value)}
-                placeholder="例：会社のオフィスがなぜか豪華客船になってて..."
+                placeholder="例：しおちゃんと水族館に行って新しい巨大水槽を見ました..."
                 rows={4}
                 className="w-full p-3.5 rounded-xl border text-xs focus:outline-none leading-relaxed transition-colors font-sans"
                 style={{
@@ -379,10 +565,10 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
             </div>
           )}
 
-          {/* Real-time transcribed text preview if speech worked */}
+          {/* Real-time transcribed text preview with AI Voiceprint Tuning Actions */}
           {!isManualTextMode && transcribedText && (
             <div 
-              className="rounded-xl p-3.5 border text-xs space-y-1.5 animate-in fade-in"
+              className="rounded-xl p-3.5 border text-xs space-y-2 animate-in fade-in"
               style={{
                 backgroundColor: currentStyle.colors.bg,
                 borderColor: currentStyle.colors.border,
@@ -393,18 +579,58 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
                   <Volume2 className="w-3.5 h-3.5 mr-1 text-emerald-500" />
                   文字起こし内容:
                 </span>
-                <button
-                  onClick={() => setIsManualTextMode(true)}
-                  className="hover:underline flex items-center cursor-pointer"
-                  style={{ color: currentStyle.colors.accent }}
-                >
-                  <Edit3 className="w-3 h-3 mr-1" />
-                  テキストを手修正
-                </button>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={handleManualDeduplicate}
+                    className="hover:underline flex items-center cursor-pointer text-[10px]"
+                    title="連続する重複フレーズを削除"
+                  >
+                    <RefreshCw className="w-2.5 h-2.5 mr-0.5" />
+                    重複除去
+                  </button>
+                  <button
+                    onClick={() => setIsManualTextMode(true)}
+                    className="hover:underline flex items-center cursor-pointer text-[10px]"
+                    style={{ color: currentStyle.colors.accent }}
+                  >
+                    <Edit3 className="w-2.5 h-2.5 mr-0.5" />
+                    編集
+                  </button>
+                </div>
               </div>
-              <p className="leading-relaxed font-sans opacity-95">
+
+              <p className="leading-relaxed font-sans opacity-95 text-xs select-text">
                 {transcribedText}
               </p>
+
+              {/* AI Voiceprint Refine Notice */}
+              {aiRefineNotice && (
+                <div className="pt-1.5 flex items-center space-x-1.5 text-[10px] text-emerald-600 font-medium border-t border-black/5">
+                  <Check className="w-3 h-3 text-emerald-600" />
+                  <span>{aiRefineNotice}</span>
+                </div>
+              )}
+
+              {/* Optional Manual trigger for AI Voice Tuning */}
+              <div className="pt-1 flex items-center justify-between">
+                <button
+                  onClick={handleAiRefinement}
+                  disabled={isAiRefining || !transcribedText.trim()}
+                  className="py-1 px-2.5 rounded-lg border text-[10px] font-bold flex items-center space-x-1 cursor-pointer hover:opacity-100 opacity-80 disabled:opacity-40"
+                  style={{
+                    borderColor: currentStyle.colors.accent + '50',
+                    backgroundColor: currentStyle.colors.accent + '15',
+                    color: currentStyle.colors.accent,
+                  }}
+                >
+                  <Wand2 className={`w-3 h-3 ${isAiRefining ? 'animate-spin' : ''}`} />
+                  <span>{isAiRefining ? 'AI声紋補正中...' : 'AI声紋補正で文字起こしを最適化'}</span>
+                </button>
+
+                <span className="text-[10px] opacity-60">
+                  {transcribedText.length}文字
+                </span>
+              </div>
             </div>
           )}
 
@@ -496,4 +722,3 @@ export const VoiceRecordModal: React.FC<VoiceRecordModalProps> = ({
     </div>
   );
 };
-

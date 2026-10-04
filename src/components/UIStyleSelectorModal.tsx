@@ -1,6 +1,7 @@
 import React from 'react';
 import { useUIStyle, UI_STYLES, UIStyleId } from '../context/UIStyleContext';
-import { Palette, Check, Sparkles, X, Radio } from 'lucide-react';
+import { Palette, Check, Sparkles, X, Radio, Volume2, Play } from 'lucide-react';
+import { audioEngine } from '../utils/audioEngine';
 import { StorybookDecorations, CelestialDecorations, GlassSpecimenDecorations, RetroCassetteDecorations } from './Decorations';
 import { SparkleAsset, MoonCrestAsset, CloseCrossAsset } from './IllustratedAssets';
 
@@ -41,15 +42,19 @@ export const UIStyleSelectorModal: React.FC<UIStyleSelectorModalProps> = ({
             </div>
             <div>
               <h3 className="text-base font-bold">デザイン性・装飾スタイルの検討（4方向）</h3>
-              <p className="text-xs opacity-70">色だけでなく、装飾アセット・造形・世界観が大きく変化します</p>
+              <p className="text-xs opacity-70">色だけでなく装飾アセット・造形・環境サウンドが切り替わります</p>
             </div>
           </div>
 
           <button
-            onClick={onClose}
+            onClick={() => {
+              audioEngine.playMechanicalClick('low');
+              onClose();
+            }}
             className="p-1.5 rounded-full hover:bg-black/5 opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
+            title="閉じる"
           >
-            <X className="w-5 h-5" />
+            <CloseCrossAsset size={16} />
           </button>
         </div>
 
@@ -62,7 +67,10 @@ export const UIStyleSelectorModal: React.FC<UIStyleSelectorModalProps> = ({
             return (
               <div
                 key={style.id}
-                onClick={() => setStyle(style.id)}
+                onClick={() => {
+                  audioEngine.playThemeSound(style.id, 'open');
+                  setStyle(style.id);
+                }}
                 className={`p-4 rounded-2xl border-2 transition-all cursor-pointer relative overflow-hidden ${
                   isSelected
                     ? 'ring-2 ring-offset-1 shadow-lg'
@@ -192,6 +200,35 @@ export const UIStyleSelectorModal: React.FC<UIStyleSelectorModalProps> = ({
                       <GlassSpecimenDecorations.SpecimenLabel id="SPEC-01" name="記憶標本" />
                     </div>
                   )}
+                </div>
+
+                {/* Sound effect info & audition pill */}
+                <div className="mt-2 flex items-center justify-between pt-1 text-[11px] opacity-80">
+                  <span className="flex items-center space-x-1">
+                    <Volume2 className="w-3 h-3 text-current opacity-70" />
+                    <span className="text-[10px]">
+                      {style.id === 'washi' && '音響：和紙めくり＆筆音'}
+                      {style.id === 'midnight' && '音響：天球チェレスタ＆星の瞬き'}
+                      {style.id === 'vintage' && '音響：昭和磁気テープ＆メカクリック'}
+                      {style.id === 'pastel' && '音響：標本ガラス瓶の共鳴＆水滴'}
+                    </span>
+                  </span>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      audioEngine.playThemeSound(style.id, 'open');
+                    }}
+                    className="py-0.5 px-2 rounded-md border text-[10px] font-bold flex items-center space-x-1 hover:opacity-100 opacity-75 active:scale-95 cursor-pointer"
+                    style={{
+                      borderColor: style.colors.border,
+                      backgroundColor: style.colors.cardBg,
+                    }}
+                    title="環境音を試聴"
+                  >
+                    <Play className="w-2.5 h-2.5 fill-current" />
+                    <span>音を試聴</span>
+                  </button>
                 </div>
               </div>
             );

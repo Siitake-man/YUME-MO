@@ -326,6 +326,9 @@ export const HitsujiMascot: React.FC<MascotBaseProps> = ({
   );
 };
 
+// Alias for SheepMascot
+export const SheepMascot = HitsujiMascot;
+
 // ============================================================================
 // 3. TSUKISAMA MASCOT (お月様 - すやすやナイトキャップ三日月)
 // ============================================================================

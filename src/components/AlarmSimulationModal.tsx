@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, Mic, X, Moon, Sun, Sparkles, Volume2 } from 'lucide-react';
 import { AppSettings } from '../types';
+import { audioEngine, ALARM_SOUND_PRESETS } from '../utils/audioEngine';
+import { SparkleAsset } from './IllustratedAssets';
 
 interface AlarmSimulationModalProps {
   isOpen: boolean;
@@ -19,13 +21,41 @@ export const AlarmSimulationModal: React.FC<AlarmSimulationModalProps> = ({
 
   useEffect(() => {
     if (!isOpen) return;
+
+    // Start playing the chosen alarm sound loop!
+    const soundId = settings.alarmSound || 'musicbox_lullaby';
+    const volume = settings.alarmVolume ?? 0.7;
+    audioEngine.startAlarmLoop(soundId, volume, settings.customAlarmAudio);
+
     const interval = setInterval(() => {
       setPulse((prev) => !prev);
     }, 700);
-    return () => clearInterval(interval);
-  }, [isOpen]);
+
+    return () => {
+      clearInterval(interval);
+      audioEngine.stopAlarm();
+    };
+  }, [isOpen, settings.alarmSound, settings.alarmVolume, settings.customAlarmAudio]);
+
+  const handleStopAndRecord = () => {
+    audioEngine.stopAlarm();
+    audioEngine.playMechanicalClick('high');
+    onDismissAndRecord();
+  };
+
+  const handleStopOnly = () => {
+    audioEngine.stopAlarm();
+    audioEngine.playMechanicalClick('low');
+    onDismissOnly();
+  };
 
   if (!isOpen) return null;
+
+  // Sound preset display name
+  const currentPreset = ALARM_SOUND_PRESETS.find(p => p.id === settings.alarmSound);
+  const soundLabel = settings.alarmSound === 'custom'
+    ? (settings.customAlarmLabel || 'お気に入り録音音声')
+    : (currentPreset ? currentPreset.name : 'オルゴール夢うつつ');
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-in fade-in duration-300">
@@ -43,12 +73,16 @@ export const AlarmSimulationModal: React.FC<AlarmSimulationModalProps> = ({
           </div>
         </div>
 
-        {/* Current Alarm Time */}
-        <div className="space-y-1">
+        {/* Current Alarm Time & Sound Indicator */}
+        <div className="space-y-1.5">
           <div className="text-4xl sm:text-5xl font-mono font-bold tracking-tight text-white">
             {settings.alarmTime}
           </div>
-          <p className="text-xs text-[#BDB1D5] font-medium">
+          <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs text-amber-200">
+            <Volume2 className="w-3.5 h-3.5 animate-pulse" />
+            <span className="font-medium">鳴動中：{soundLabel}</span>
+          </div>
+          <p className="text-xs text-[#BDB1D5] font-medium pt-0.5">
             おはようございます。朝の時間がやってきました。
           </p>
         </div>
@@ -68,7 +102,7 @@ export const AlarmSimulationModal: React.FC<AlarmSimulationModalProps> = ({
           {/* Main Action: Stop Alarm & Record Dream */}
           <button
             id="alarm-stop-and-record-btn"
-            onClick={onDismissAndRecord}
+            onClick={handleStopAndRecord}
             className="w-full py-3.5 px-4 rounded-2xl bg-[#D2725E] hover:bg-[#bd6350] active:scale-98 text-white font-bold text-sm shadow-lg flex items-center justify-center space-x-2 transition-all cursor-pointer"
           >
             <Mic className="w-5 h-5 animate-pulse" />
@@ -77,7 +111,7 @@ export const AlarmSimulationModal: React.FC<AlarmSimulationModalProps> = ({
 
           {/* Secondary Action: Just Stop */}
           <button
-            onClick={onDismissOnly}
+            onClick={handleStopOnly}
             className="w-full py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white/20 active:scale-98 text-white/70 text-xs font-medium transition-all cursor-pointer"
           >
             アラームだけ止める（夢は覚えていない）

@@ -9,7 +9,19 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
+// Security & model constants
+const MODEL_TEXT = 'gemini-3.8-flash';
+const MODEL_IMAGE = 'gemini-3.1-flash-lite-image';
+const MAX_TEXT_INPUT_LENGTH = 15000;
+const MAX_PANELS_BATCH_LIMIT = 10;
+
 app.use(express.json({ limit: '10mb' }));
+
+// Input sanitizer helper to prevent DoS & injection
+function sanitizeTextInput(text: unknown, maxLen = MAX_TEXT_INPUT_LENGTH): string {
+  if (typeof text !== 'string') return '';
+  return text.slice(0, maxLen).trim();
+}
 
 // Lazy initialize Gemini client
 function getGeminiClient(): GoogleGenAI | null {
@@ -60,9 +72,9 @@ function generateFallbackAnalysis(rawText: string) {
 // POST /api/analyze-dream
 app.post('/api/analyze-dream', async (req, res) => {
   try {
-    const { rawTranscription } = req.body;
-    if (!rawTranscription || typeof rawTranscription !== 'string') {
-      res.status(400).json({ error: 'rawTranscription is required' });
+    const rawTranscription = sanitizeTextInput(req.body?.rawTranscription);
+    if (!rawTranscription) {
+      res.status(400).json({ error: 'rawTranscription is required and must not be empty' });
       return;
     }
 
@@ -89,7 +101,7 @@ ${rawTranscription}
 `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.7-flash',
+      model: MODEL_TEXT,
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -138,10 +150,176 @@ ${rawTranscription}
   }
 });
 
+// Helper for server-side deduplication of repeated phrases
+function cleanAndDeduplicateServerTranscript(raw: string, keywords: string[] = []): string {
+  if (!raw) return '';
+  let text = raw.trim();
+
+  // Normalize spaces
+  text = text.replace(/[\t ]+/g, ' ');
+
+  // Detect repeating sequences of length 4 to 120 chars
+  const maxChunkLen = Math.min(120, Math.floor(text.length / 2));
+  for (let len = maxChunkLen; len >= 4; len--) {
+    let i = 0;
+    while (i <= text.length - len * 2) {
+      const chunk = text.slice(i, i + len);
+      if (/^[、。\s\n！？!?・…]+$/.test(chunk)) {
+        i++;
+        continue;
+      }
+      let repeats = 1;
+      while (
+        i + (repeats + 1) * len <= text.length &&
+        text.slice(i + repeats * len, i + (repeats + 1) * len) === chunk
+      ) {
+        repeats++;
+      }
+      if (repeats > 1) {
+        text = text.slice(0, i + len) + text.slice(i + repeats * len);
+      } else {
+        i++;
+      }
+    }
+  }
+
+  // Clause level deduplication
+  const segments = text.split(/([、。\n\s]+)/);
+  const cleaned: string[] = [];
+  let lastText = '';
+  for (const s of segments) {
+    if (/^[、。\n\s]+$/.test(s)) {
+      cleaned.push(s);
+    } else {
+      const trimmed = s.trim();
+      if (trimmed.length >= 3 && trimmed === lastText) {
+        if (cleaned.length > 0 && /^[、。\s]+$/.test(cleaned[cleaned.length - 1])) {
+          cleaned.pop();
+        }
+        continue;
+      }
+      lastText = trimmed;
+      cleaned.push(s);
+    }
+  }
+  text = cleaned.join('');
+
+  // Keyword dictionary phonetic tuning
+  for (const kw of keywords) {
+    const cleanKw = kw.trim();
+    if (!cleanKw || cleanKw.length < 2) continue;
+    if (cleanKw === 'しおちゃん') {
+      text = text.replace(/塩ちゃん|シオちゃん|潮ちゃん|しおチャン/g, 'しおちゃん');
+    }
+  }
+
+  text = text.replace(/[、。]{2,}/g, '。');
+  return text.trim();
+}
+
+// POST /api/transcribe-voice (AI Voiceprint Tuning & Speech De-duplication)
+app.post('/api/transcribe-voice', async (req, res) => {
+  try {
+    const rawDraft = sanitizeTextInput(req.body?.rawDraft);
+    const audioData = typeof req.body?.audioData === 'string' ? req.body.audioData : undefined;
+    const voiceprintProfile = req.body?.voiceprintProfile;
+    
+    // Sanitize keywords array safely
+    const rawKeywords = Array.isArray(voiceprintProfile?.frequentKeywords) ? voiceprintProfile.frequentKeywords : [];
+    const keywords: string[] = rawKeywords
+      .filter((k: unknown): k is string => typeof k === 'string')
+      .map((k: string) => sanitizeTextInput(k, 50))
+      .filter(Boolean)
+      .slice(0, 30);
+
+    const pitchCategory = ['low', 'mid', 'high'].includes(voiceprintProfile?.pitchCategory) 
+      ? voiceprintProfile.pitchCategory 
+      : 'mid';
+    const isMorningBoost = voiceprintProfile?.morningVoiceBoost ?? true;
+
+    // Fast rule-based clean first
+    const ruleCleaned = cleanAndDeduplicateServerTranscript(rawDraft, keywords);
+
+    const ai = getGeminiClient();
+    if (!ai) {
+      res.json({
+        transcribedText: ruleCleaned,
+        method: 'local_voiceprint_rules',
+        deduplicated: ruleCleaned !== rawDraft,
+      });
+      return;
+    }
+
+    const keywordHint = keywords.length > 0
+      ? `\n【ユーザー登録の重要人物・固有名詞辞書】: ${keywords.join(', ')} (音の似た語彙はこれらに寄せて正確に表記)`
+      : '';
+
+    const parts: any[] = [];
+
+    // If base64 audio data provided
+    if (audioData && typeof audioData === 'string' && audioData.includes('base64,')) {
+      const mimeMatch = audioData.match(/^data:([^;]+);base64,/);
+      const mimeType = mimeMatch ? mimeMatch[1] : 'audio/webm';
+      const base64Data = audioData.split('base64,')[1];
+      parts.push({
+        inlineData: {
+          mimeType,
+          data: base64Data,
+        },
+      });
+    }
+
+    const promptText = `あなたは起床直後の「夢の記録」音声の専門AI文字起こし・声紋補正エンジンです。
+ユーザーは寝起きの状態で夢を語っており、寝起き特有のかすれ声・ぼそぼそ声、およびブラウザ音声認識の連続反復リピート不具合が発生しています。
+
+【ユーザーの声紋・声質プロファイル】
+- 声質トーン: ${pitchCategory === 'low' ? '落ち着いた低音（寝起き・ハスキー）' : pitchCategory === 'high' ? '高音（明瞭）' : '自然な中音域'}
+- 寝起きかすれ声ブースト: ${isMorningBoost ? '有効' : '無効'}${keywordHint}
+
+【厳守指示】
+1. 音声または下書きテキストを分析し、自然で正確な日本語の文章として整理してください。
+2. 同一フレーズや文が連続して何度も繰り返されているリピートバグ（例：「水族館に行って新しいを見る水族館に行って新しいを見る」「いい夢を見ましたいい夢を見ました」）は【完全に1回だけに整理・排除】してください。
+3. ユーザー辞書にある言葉（例:「しおちゃん」等）は誤認（塩ちゃん、潮など）を正しく修正してください。
+4. 説明や前置き、解説は一切書かず、補正後の日本語テキストのみを出力してください。
+
+${rawDraft ? `【下書きテキスト】:\n"""\n${rawDraft}\n"""` : ''}`;
+
+    parts.push({ text: promptText });
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.8-flash',
+      contents: {
+        parts,
+      },
+    });
+
+    const output = response.text ? response.text.trim() : ruleCleaned;
+    const finalCleaned = cleanAndDeduplicateServerTranscript(output, keywords);
+
+    res.json({
+      transcribedText: finalCleaned,
+      method: 'gemini_voiceprint_ai',
+      deduplicated: true,
+    });
+  } catch (error) {
+    console.error('Error in transcribe-voice:', error);
+    const keywords = req.body?.voiceprintProfile?.frequentKeywords || [];
+    const fallback = cleanAndDeduplicateServerTranscript(req.body?.rawDraft || '', keywords);
+    res.json({
+      transcribedText: fallback,
+      method: 'fallback_rules',
+    });
+  }
+});
+
 // POST /api/generate-comic
 app.post('/api/generate-comic', async (req, res) => {
   try {
-    const { title, summary, rawTranscription, style = 'retro_manga', customStylePrompt = '' } = req.body;
+    const title = sanitizeTextInput(req.body?.title, 100);
+    const summary = sanitizeTextInput(req.body?.summary, 1000);
+    const rawTranscription = sanitizeTextInput(req.body?.rawTranscription);
+    const style = sanitizeTextInput(req.body?.style, 50) || 'retro_manga';
+    const customStylePrompt = sanitizeTextInput(req.body?.customStylePrompt, 200);
 
     const styleLabels: Record<string, string> = {
       retro_manga: '昭和レトロ漫画（1970〜80年代の少年漫画・劇画風）',
@@ -230,7 +408,7 @@ ${customStylePrompt ? `ユーザー指定の特別テイスト：${customStylePr
 `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.7-flash',
+      model: MODEL_TEXT,
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -343,7 +521,14 @@ function formatGeminiError(error: any): string {
 // POST /api/generate-ai-image (Generate single image for comic panel or dream key visual)
 app.post('/api/generate-ai-image', async (req, res) => {
   try {
-    const { prompt: rawPrompt, heading = '', description = '', style = 'storybook', customStyle = '', dreamTitle = '', aspectRatio = '1:1' } = req.body;
+    const rawPrompt = sanitizeTextInput(req.body?.prompt, 1000);
+    const heading = sanitizeTextInput(req.body?.heading, 100);
+    const description = sanitizeTextInput(req.body?.description, 500);
+    const style = sanitizeTextInput(req.body?.style, 50) || 'storybook';
+    const customStyle = sanitizeTextInput(req.body?.customStyle, 200);
+    const dreamTitle = sanitizeTextInput(req.body?.dreamTitle, 100);
+    const validRatios = ['1:1', '3:4', '4:3', '9:16', '16:9'];
+    const aspectRatio = validRatios.includes(req.body?.aspectRatio) ? req.body.aspectRatio : '1:1';
 
     const finalPrompt = rawPrompt || buildImagePrompt(description, heading, style, dreamTitle, customStyle);
 
@@ -359,9 +544,9 @@ app.post('/api/generate-ai-image', async (req, res) => {
 
     console.log('Generating image for prompt:', finalPrompt);
 
-    // Call Gemini Image Generation model (gemini-3.1-flash-lite-image)
+    // Call Gemini Image Generation model
     const response = await ai.models.generateContent({
-      model: 'gemini-3.1-flash-lite-image',
+      model: MODEL_IMAGE,
       contents: {
         parts: [
           {
@@ -395,7 +580,7 @@ app.post('/api/generate-ai-image', async (req, res) => {
         costEstimate: {
           usd: 0.03,
           jpy: 4.5,
-          model: 'gemini-3.1-flash-lite-image'
+          model: MODEL_IMAGE
         }
       });
     } else {
@@ -413,14 +598,18 @@ app.post('/api/generate-ai-image', async (req, res) => {
   }
 });
 
-// POST /api/generate-all-panel-images (Generate all 4 panels images in parallel)
+// POST /api/generate-all-panel-images (Generate all panels images in parallel with safe limit)
 app.post('/api/generate-all-panel-images', async (req, res) => {
   try {
-    const { panels, style = 'storybook', customStyle = '', dreamTitle = '' } = req.body;
-    if (!panels || !Array.isArray(panels)) {
+    const rawPanels = req.body?.panels;
+    if (!rawPanels || !Array.isArray(rawPanels)) {
       res.status(400).json({ error: 'panels array is required' });
       return;
     }
+    const panels = rawPanels.slice(0, MAX_PANELS_BATCH_LIMIT);
+    const style = sanitizeTextInput(req.body?.style, 50) || 'storybook';
+    const customStyle = sanitizeTextInput(req.body?.customStyle, 200);
+    const dreamTitle = sanitizeTextInput(req.body?.dreamTitle, 100);
 
     const ai = getGeminiClient();
     if (!ai) {
@@ -431,12 +620,14 @@ app.post('/api/generate-all-panel-images', async (req, res) => {
 
     console.log(`Starting parallel image generation for ${panels.length} panels, style: ${style}, custom: ${customStyle}`);
 
-    // Process all panels in parallel
+    // Process panels safely in parallel
     const imagePromises = panels.map(async (panel: any) => {
-      const prompt = buildImagePrompt(panel.description || '', panel.heading || '', style, dreamTitle, customStyle);
+      const panelDesc = sanitizeTextInput(panel.description, 500);
+      const panelHeading = sanitizeTextInput(panel.heading, 100);
+      const prompt = buildImagePrompt(panelDesc, panelHeading, style, dreamTitle, customStyle);
       try {
         const response = await ai.models.generateContent({
-          model: 'gemini-3.1-flash-lite-image',
+          model: MODEL_IMAGE,
           contents: {
             parts: [{ text: prompt }],
           },
@@ -481,7 +672,7 @@ app.post('/api/generate-all-panel-images', async (req, res) => {
         generatedCount: successCount,
         unitPriceUsd: 0.03,
         unitPriceJpy: 4.5,
-        model: 'gemini-3.1-flash-lite-image'
+        model: MODEL_IMAGE
       }
     });
   } catch (error: any) {

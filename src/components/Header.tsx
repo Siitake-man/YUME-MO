@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, Palette } from 'lucide-react';
+import { Bell, Palette, HelpCircle, Compass } from 'lucide-react';
 import { AppSettings } from '../types';
 import { useUIStyle } from '../context/UIStyleContext';
 import { TsukisamaMascot } from './DreamMascots';
@@ -8,9 +8,16 @@ import { SparkleAsset, MoonCrestAsset } from './IllustratedAssets';
 interface HeaderProps {
   settings: AppSettings;
   onSimulateAlarm: () => void;
+  onOpenHelp?: () => void;
+  onOpenTour?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ settings, onSimulateAlarm }) => {
+export const Header: React.FC<HeaderProps> = ({ 
+  settings, 
+  onSimulateAlarm,
+  onOpenHelp,
+  onOpenTour,
+}) => {
   const { currentStyle, openStyleSelector } = useUIStyle();
 
   const now = new Date();
@@ -76,8 +83,42 @@ export const Header: React.FC<HeaderProps> = ({ settings, onSimulateAlarm }) => 
             </div>
           </div>
 
-          {/* Style Selector & Alarm Buttons */}
+          {/* Navigation and Action Buttons */}
           <div className="flex items-center space-x-1.5">
+            {/* Tour Guide Button */}
+            {onOpenTour && (
+              <button
+                onClick={onOpenTour}
+                className="flex items-center space-x-1 text-xs px-2 py-1.5 rounded-full border transition-all cursor-pointer shadow-2xs hover:opacity-90 active:scale-95"
+                style={{
+                  backgroundColor: currentStyle.colors.cardBg,
+                  borderColor: currentStyle.colors.border,
+                  color: currentStyle.colors.textPrimary,
+                }}
+                title="アプリの利用ツアーを見る"
+              >
+                <Compass className="w-3.5 h-3.5" style={{ color: currentStyle.colors.accent }} />
+                <span className="font-bold text-[11px] hidden sm:inline">ツアー</span>
+              </button>
+            )}
+
+            {/* Help & FAQ Button */}
+            {onOpenHelp && (
+              <button
+                onClick={onOpenHelp}
+                className="flex items-center space-x-1 text-xs px-2 py-1.5 rounded-full border transition-all cursor-pointer shadow-2xs hover:opacity-90 active:scale-95"
+                style={{
+                  backgroundColor: currentStyle.colors.cardBg,
+                  borderColor: currentStyle.colors.border,
+                  color: currentStyle.colors.textPrimary,
+                }}
+                title="ヘルプ & よくある質問"
+              >
+                <HelpCircle className="w-3.5 h-3.5" style={{ color: currentStyle.colors.accentSecondary }} />
+                <span className="font-bold text-[11px] hidden sm:inline">ヘルプ</span>
+              </button>
+            )}
+
             {/* Style Selector Button */}
             <button
               onClick={openStyleSelector}

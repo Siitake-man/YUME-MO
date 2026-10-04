@@ -12,8 +12,11 @@ import { ComicGeneratorModal } from './components/ComicGeneratorModal';
 import { DreamGalleryView } from './components/DreamGalleryView';
 import { DreamAnalyticsView } from './components/DreamAnalyticsView';
 import { SettingsView } from './components/SettingsView';
+import { VoiceprintModal } from './components/VoiceprintModal';
 import { AlarmSimulationModal } from './components/AlarmSimulationModal';
 import { UIStyleSelectorModal } from './components/UIStyleSelectorModal';
+import { AppHelpModal } from './components/AppHelpModal';
+import { AppGuideTourModal } from './components/AppGuideTourModal';
 import { audioEngine } from './utils/audioEngine';
 import { MascotWalkLane, BakuMascot, HitsujiMascot } from './components/DreamMascots';
 import { HandwrittenPostIt, HandwrittenArrow, CuteStamp } from './components/PlayfulAccents';
@@ -62,10 +65,13 @@ function MainAppContent() {
 
   // Modals state
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState<boolean>(false);
+  const [isVoiceprintModalOpen, setIsVoiceprintModalOpen] = useState<boolean>(false);
   const [isAlarmModalOpen, setIsAlarmModalOpen] = useState<boolean>(false);
   const [isEditorModalOpen, setIsEditorModalOpen] = useState<boolean>(false);
   const [isComicModalOpen, setIsComicModalOpen] = useState<boolean>(false);
   const [comicTargetDream, setComicTargetDream] = useState<DreamRecord | null>(null);
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState<boolean>(false);
+  const [isTourModalOpen, setIsTourModalOpen] = useState<boolean>(false);
 
   // Intermediate recording state
   const [transcribedText, setTranscribedText] = useState<string>('');
@@ -80,6 +86,17 @@ function MainAppContent() {
   useEffect(() => {
     localStorage.setItem('yumenoto_settings', JSON.stringify(settings));
   }, [settings]);
+
+  // First-time visitor tour guide trigger
+  useEffect(() => {
+    const hasSeenTour = localStorage.getItem('yumenoto_has_seen_tour');
+    if (!hasSeenTour) {
+      const timer = setTimeout(() => {
+        setIsTourModalOpen(true);
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   // Handle voice transcription completion
   const handleTranscriptionComplete = (text: string, durationSec: number) => {
@@ -689,6 +706,9 @@ function MainAppContent() {
             onUpdateSettings={setSettings}
             onSimulateAlarm={() => setIsAlarmModalOpen(true)}
             onResetAllData={handleResetAllData}
+            onOpenVoiceprintModal={() => setIsVoiceprintModalOpen(true)}
+            onOpenHelp={() => setIsHelpModalOpen(true)}
+            onOpenTour={() => setIsTourModalOpen(true)}
           />
         );
     }
@@ -708,6 +728,8 @@ function MainAppContent() {
           <Header
             settings={settings}
             onSimulateAlarm={() => setIsAlarmModalOpen(true)}
+            onOpenHelp={() => setIsHelpModalOpen(true)}
+            onOpenTour={() => setIsTourModalOpen(true)}
           />
         )}
 
@@ -737,6 +759,8 @@ function MainAppContent() {
           onClose={() => setIsVoiceModalOpen(false)}
           onTranscriptionComplete={handleTranscriptionComplete}
           isAlarmTriggered={isAlarmTriggered}
+          settings={settings}
+          onOpenVoiceprintTuning={() => setIsVoiceprintModalOpen(true)}
         />
 
         {/* Modal 2: AI Dream Classification & Editor Screen */}
@@ -772,10 +796,50 @@ function MainAppContent() {
           }}
         />
 
-        {/* Modal 5: UI Style Direction Candidates Selector */}
+        {/* Modal 5: Voiceprint Calibration & Transcription Tuning */}
+        <VoiceprintModal
+          isOpen={isVoiceprintModalOpen}
+          onClose={() => setIsVoiceprintModalOpen(false)}
+          settings={settings}
+          onSaveProfile={(newProfile) => {
+            setSettings((prev) => ({
+              ...prev,
+              voiceprintProfile: newProfile,
+            }));
+          }}
+        />
+
+        {/* Modal 6: UI Style Direction Candidates Selector */}
         <UIStyleSelectorModal
           isOpen={isStyleSelectorOpen}
           onClose={closeStyleSelector}
+        />
+
+        {/* Modal 7: Help & FAQ Modal */}
+        <AppHelpModal
+          isOpen={isHelpModalOpen}
+          onClose={() => setIsHelpModalOpen(false)}
+          onStartTour={() => {
+            setIsHelpModalOpen(false);
+            setIsTourModalOpen(true);
+          }}
+        />
+
+        {/* Modal 8: Interactive Guide Tour Modal */}
+        <AppGuideTourModal
+          isOpen={isTourModalOpen}
+          onClose={() => setIsTourModalOpen(false)}
+          onCompleteTour={() => {
+            localStorage.setItem('yumenoto_has_seen_tour', 'true');
+            setIsTourModalOpen(false);
+          }}
+          onOpenRecordModal={() => {
+            setIsAlarmTriggered(false);
+            setIsVoiceModalOpen(true);
+          }}
+          onSimulateAlarm={() => {
+            setIsAlarmModalOpen(true);
+          }}
         />
 
         {/* Floating Quick Voice Recording Widget */}

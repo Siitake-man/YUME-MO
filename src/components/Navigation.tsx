@@ -19,7 +19,7 @@ export const Navigation: React.FC<NavigationProps> = ({
   const { currentStyle } = useUIStyle();
 
   const handleTab = (tab: NavTab) => {
-    audioEngine.playMechanicalClick('high');
+    audioEngine.playThemeSound(currentStyle.id, 'nav');
     onTabChange(tab);
   };
 
@@ -80,7 +80,7 @@ export const Navigation: React.FC<NavigationProps> = ({
         <button
           id="nav-floating-record-btn"
           onClick={() => {
-            audioEngine.playMechanicalClick('high');
+            audioEngine.playThemeSound(currentStyle.id, 'action');
             onOpenRecord();
           }}
           className="relative -top-4 flex flex-col items-center group cursor-pointer"
